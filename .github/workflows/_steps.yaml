@@ -1,0 +1,14 @@
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v2
+
+  - name: Install packages
+    run: sudo apt install unzip qemu-utils rsync gdisk
+
+  - name: Run build script
+    run: sudo bash build.bash
+  - name: Upload Release Artifacts
+    uses: actions/upload-artifact@v2
+    with:
+      name: build-artifacts
+      path: ./chr*

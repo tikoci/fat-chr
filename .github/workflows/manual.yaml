@@ -1,0 +1,10 @@
+name: Manual Trigger
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+  extends: .github/workflows/_steps.yaml

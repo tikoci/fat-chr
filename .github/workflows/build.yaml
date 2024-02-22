@@ -4,22 +4,11 @@ on:
   push:
     branches:
       - main  # You can change this to match your main branch name
+  schedule:
+      - cron: '0 0 * * 1'  # Run every Monday at midnight UTC
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Install packages
-      run: sudo apt install unzip qemu-utils rsync gdisk
-
-    - name: Run build script
-      run: sudo bash build.bash
-    - name: Upload Release Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: build-artifacts
-        path: ./chr*
+    extends: .github/workflows/_steps.yaml
