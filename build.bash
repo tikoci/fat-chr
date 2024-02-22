@@ -45,4 +45,5 @@ qemu-nbd -d /dev/nbd0
 echo "created file chr.qcow2, now back to raw but uncompressed..."
 qemu-img convert -f qcow2 -O raw chr.qcow2 chr-$ROSVER.uefi-fat.raw
 echo "*** created chr-$ROSVER.uefi-fat.raw"
+sleep 1
 done
