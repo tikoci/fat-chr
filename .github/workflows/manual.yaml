@@ -1,7 +1,0 @@
-name: Manual Trigger
-
-on:
-  workflow_dispatch:
-
-jobs:
-  uses: .github/workflows/_steps.yaml
