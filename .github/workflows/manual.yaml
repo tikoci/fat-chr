@@ -5,6 +5,4 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-  
-  extends: .github/workflows/_steps.yaml
+    extends: .github/workflows/_steps.yaml#jobs.build
