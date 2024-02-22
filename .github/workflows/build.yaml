@@ -7,4 +7,5 @@ on:
   schedule:
       - cron: '0 0 * * 1'  # Run every Monday at midnight UTC
 
-uses: .github/workflows/_steps.yaml#jobs.build
+jobs:
+  uses: .github/workflows/_steps.yaml

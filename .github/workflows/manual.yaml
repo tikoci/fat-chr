@@ -3,4 +3,5 @@ name: Manual Trigger
 on:
   workflow_dispatch:
 
-uses: .github/workflows/_steps.yaml#jobs.build
+jobs:
+  uses: .github/workflows/_steps.yaml
