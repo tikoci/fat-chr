@@ -14,10 +14,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install packages
-      uses: sudo apt install unzip qemu-utils rsync gdisk
+      run: sudo apt install unzip qemu-utils rsync gdisk
 
     - name: Run build script
-      run: bash build.bash
+      run: sudo bash build.bash
 
     - name: Create Release
       id: create_release
