@@ -13,6 +13,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Install packages
+      uses: sudo apt install unzip qemu-utils rsync gdisk
+
     - name: Run build script
       run: bash build.bash
 
