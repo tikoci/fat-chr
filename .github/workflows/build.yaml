@@ -18,29 +18,8 @@ jobs:
 
     - name: Run build script
       run: sudo bash build.bash
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # This token is provided by GitHub Actions
-
+    - name: Upload Release Artifacts
+      uses: actions/upload-artifact@v2
       with:
-        tag_name: v1.0.0  # You can specify your desired tag name here
-        release_name: Release v1.0.0  # You can specify your desired release name here
-        body: |
-          Release created by GitHub Actions.
-        draft: false
-        prerelease: false
-
-    - name: Upload files to the release
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # This token is provided by GitHub Actions
-
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./chr*  # Specify the path to your generated files
-        asset_name: generated-files.zip  # Specify the name of the asset to be uploaded
-        asset_content_type: application/zip
+        name: build-artifacts
+        path: ./chr*
