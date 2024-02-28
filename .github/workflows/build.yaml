@@ -16,11 +16,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install packages
+      - name: Install packages into building machine
         run: sudo apt-get install -y unzip qemu-utils rsync gdisk
-      - name: Run build script
+      - name: Run script to download and modify the CHR images
         run: sudo bash build.bash
-      - name: Upload Release Artifacts
+      - name: Upload created image files as artifacts of build
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
@@ -34,36 +34,47 @@ jobs:
           echo "testing=$ROSTEST" >> $GITHUB_OUTPUT
           echo "stable=$ROSSTABLE"
           echo "testing=$ROSTEST"
-      - name: Print versions
+      - name: Print versions for debugging
         run: |
           echo "The latest stable version is ${{ steps.get-versions.outputs.stable }}"
           echo "The latest testing version is ${{ steps.get-versions.outputs.testing }}"
-      - name: Push Git Tag
+      - name: Push git tag to save builder's code (required for release)
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
           git tag Build${{ github.run_id }}
           git push origin Build${{ github.run_id }}
-            
-      - name: Create Release
-        id: create-release-testing
+      - name: Create GitHub release
+        id: create-release
         uses: actions/create-release@v1 # comnoco/create-release-action@v2.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: Build${{ github.run_id }} # ${{ github.ref }}
-          release_name: ${{ steps.get-versions.outputs.testing }} ${{ github.run_id }}
+          release_name: ${{ steps.get-versions.outputs.testing }} / ${{ steps.get-versions.outputs.stable }} (${{ github.run_id }})
           body: |
-            UEFI-enabled CHR image for ${{ steps.get-versions.outputs.testing }}, from build ${{ github.run_id }}
+            UEFI-enabled CHR images from builder ${{ github.run_id }} -
+            testing: ${{ steps.get-versions.outputs.testing }}
+            stable: ${{ steps.get-versions.outputs.testing }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Upload CHR TESTING image to release
+        id: upload-release-asset-testing
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create-release-testing.outputs.upload_url }}
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.raw
           asset_name: chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.raw
+          asset_content_type: application/octet-stream
+      - name: Upload CHR STABLE image to release
+        id: upload-release-asset-stable
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.raw
+          asset_name: chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.raw
           asset_content_type: application/octet-stream
