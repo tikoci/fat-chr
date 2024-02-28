@@ -1,4 +1,5 @@
 name: Build and Release
+permissions: write-all
 
 on:
   push:
@@ -27,17 +28,17 @@ jobs:
       - name: Get RouterOS _testing_ version number
         id: get-versions
         run: |
-          ROSTEST=$(curl -s https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}')
-          ROSSTABLE=$(curl -s https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}')
-          echo "::set-output name=testing::$ROSTEST"
-          echo "::set-output name=stable::$ROSSTABLE"
+          ROSTEST=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
+          ROSSTABLE=`curl https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}'`
+          echo "ROSSTABLE=stable" >> $GITHUB_OUTPUT
+          echo "ROSTESTING=testing" >> $GITHUB_OUTPUT
       - name: Print versions
         run: |
-          echo "The latest version is ${{ steps.get-versions.outputs.version }}"
-          echo "The latest version is ${{ steps.get-versions.outputs.version }}"
+          echo "The latest stable version is ${{ steps.get-versions.outputs.stable }}"
+          echo "The latest testing version is ${{ steps.get-versions.outputs.testing }}"
       - name: Create Release
         id: create-release-testing
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1 # comnoco/create-release-action@v2.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
