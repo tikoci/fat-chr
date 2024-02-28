@@ -30,8 +30,10 @@ jobs:
         run: |
           ROSTEST=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
           ROSSTABLE=`curl https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}'`
-          echo "ROSSTABLE=stable" >> $GITHUB_OUTPUT
-          echo "ROSTESTING=testing" >> $GITHUB_OUTPUT
+          echo "stable=$ROSSTABLE" >> $GITHUB_OUTPUT
+          echo "testing=$ROSTEST" >> $GITHUB_OUTPUT
+          echo "stable=$ROSSTABLE"
+          echo "testing=$ROSTEST"
       - name: Print versions
         run: |
           echo "The latest stable version is ${{ steps.get-versions.outputs.stable }}"
