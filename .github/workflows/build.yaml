@@ -51,11 +51,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: Build${{ github.run_id }} # ${{ github.ref }}
-          release_name: ${{ steps.get-versions.outputs.testing }} / ${{ steps.get-versions.outputs.stable }} (${{ github.run_id }})
+          release_name: ${{ steps.get-versions.outputs.testing }} / ${{ steps.get-versions.outputs.stable }} (Build${{ github.run_id }})
           body: |
             UEFI-enabled CHR images from builder ${{ github.run_id }} -
             testing: ${{ steps.get-versions.outputs.testing }}
-            stable: ${{ steps.get-versions.outputs.testing }}
+            stable: ${{ steps.get-versions.outputs.stable }}
           draft: false
           prerelease: false
       - name: Upload CHR TESTING image to release
