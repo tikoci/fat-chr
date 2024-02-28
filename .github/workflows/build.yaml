@@ -25,7 +25,7 @@ jobs:
         with:
           name: build-artifacts
           path: ./chr*
-      - name: Get RouterOS _testing_ version number
+      - name: Get RouterOS version number
         id: get-versions
         run: |
           ROSTEST=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
@@ -36,16 +36,23 @@ jobs:
         run: |
           echo "The latest stable version is ${{ steps.get-versions.outputs.stable }}"
           echo "The latest testing version is ${{ steps.get-versions.outputs.testing }}"
+      - name: Push Git Tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag Build${{ github.run_id }}
+          git push origin Build${{ github.run_id }}
+            
       - name: Create Release
         id: create-release-testing
         uses: actions/create-release@v1 # comnoco/create-release-action@v2.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: Build${{ github.run_id }} # ${{ github.ref }}
           release_name: ${{ steps.get-versions.outputs.testing }} ${{ github.run_id }}
           body: |
-            ${{ steps.get-versions.outputs.testing }} ${{ github.run_id }}
+            UEFI-enabled CHR image for ${{ steps.get-versions.outputs.testing }}, from build ${{ github.run_id }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
