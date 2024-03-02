@@ -70,10 +70,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: Build${{ github.run_id }}-${{matrix.channel}} # ${{ github.ref }}
-          release_name: ${{ env.ROSVER }}
+          release_name: CHR ${{ env.ROSVER }} 
           body: |
-            UEFI-enabled CHR image from builder ${{ github.run_id }}
-            for ${{ env.ROSVER }}
+            UEFI-enabled CHR images (RAW and VMDK) 
+            ${{ env.ROSVER }} (${{ matrix.channel }}) [ ${{ github.run_id }} ]
           draft: false
           prerelease: true
       - name: Upload CHR RAW image to release
