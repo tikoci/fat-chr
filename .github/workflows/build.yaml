@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v2
         if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
       - name: Install packages into building machine
-        run: sudo apt-get install -y unzip qemu-utils rsync gdisk dosfstools
+        run: sudo apt-get install -y unzip qemu-utils rsync gdisk dosfstools genisoimage
         if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
       - name: Set version if release channel name
         id: get-version
@@ -125,4 +125,15 @@ jobs:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./chr-extra-packages-${{  env.ROSVER  }}.vmdk
           asset_name: chr-extra-packages-${{  env.ROSVER  }}.vmdk
+          asset_content_type: application/octet-stream
+      - name: Upload CHR extra-packages image to release (ISO)
+        id: upload-release-asset-extra-packages-iso
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}.iso
+          asset_name: extra-packages-${{  env.ROSVER  }}.iso
           asset_content_type: application/octet-stream

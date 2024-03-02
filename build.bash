@@ -68,7 +68,8 @@ cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
 umount /tmp/tmpmntpkg
 echo "created file chr.vmdk for extra packages too"
 qemu-img convert -O vmdk chr-extra-packages-$ROSVER.raw chr-extra-packages-$ROSVER.vmdk
-
+echo "build CDROM image"
+genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
 echo "*** done "
 sleep 1
 #done
