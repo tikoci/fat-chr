@@ -61,13 +61,13 @@ mkdir /tmp/all_packages-x86-$ROSVER
 unzip /tmp/all_packages-x86-$ROSVER.zip -d /tmp/all_packages-x86-$ROSVER
 echo "create disk image with extra-packages for mounting"
 mkdir /tmp/tmpmntpkg
-qemu-img create -f raw chr-extra-packages-$ROSVER.img 16M
-mkfs.vfat chr-extra-packages-$ROSVER.img
-mount -o loop chr-extra-packages-$ROSVER.img /tmp/tmpmntpkg
+qemu-img create -f raw chr-extra-packages-$ROSVER.raw 16M
+mkfs.vfat chr-extra-packages-$ROSVER.raw
+mount -o loop chr-extra-packages-$ROSVER.raw /tmp/tmpmntpkg
 cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
 umount /tmp/tmpmntpkg
 echo "created file chr.vmdk for extra packages too"
-qemu-img convert -O vmdk chr-extra-packages-$ROSVER.img chr-extra-packages-$ROSVER.vmdk
+qemu-img convert -O vmdk chr-extra-packages-$ROSVER.raw chr-extra-packages-$ROSVER.vmdk
 
 echo "*** done "
 sleep 1
