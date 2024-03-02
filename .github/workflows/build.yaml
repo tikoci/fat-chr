@@ -74,7 +74,7 @@ jobs:
           body: |
             UEFI-enabled CHR image from builder ${{ github.run_id }}
             for ${{ env.ROSVER }}
-          draft: true
+          draft: false
           prerelease: true
       - name: Upload CHR RAW image to release
         id: upload-release-asset-raw
