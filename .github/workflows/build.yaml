@@ -20,11 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        channel: [stable, longterm, testing, dev]
-        include: 
-          - channel: custom
-            if: ${{ github.event_name == 'workflow_dispatch' }}
+        channel: [stable, longterm, testing, dev, custom]
         exclude:
+          - channel: custom
+            if: ${{ github.event_name != 'workflow_dispatch' }}
           - channel: dev
           - channel: longterm
           - channel: stable
