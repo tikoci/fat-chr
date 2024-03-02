@@ -79,7 +79,7 @@ jobs:
           asset_name: chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.raw
           asset_content_type: application/octet-stream
       - name: Upload VMDK CHR TESTING image to release
-        id: upload-release-asset-testing
+        id: upload-release-asset-testing-vmdk
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,7 +89,7 @@ jobs:
           asset_name: chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.vmdk
           asset_content_type: application/octet-stream
       - name: Upload VMDK CHR STABLE image to release
-        id: upload-release-asset-stable
+        id: upload-release-asset-stable-vmdk
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
