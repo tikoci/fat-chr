@@ -20,11 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        channel: [stable, longterm, testing, dev, custom]
+        channel: [stable, longterm, testing, dev]
         exclude:
           - channel: dev
           - channel: longterm
-      if: ${{ github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,7 +31,7 @@ jobs:
         run: sudo apt-get install -y unzip qemu-utils rsync gdisk
       - name: Set version if release channel name
         id: get-version
-        if: ${{ github.event_name == 'workflow_dispatch'  }}
+        if: ${{ github.event_name != 'workflow_dispatch'  }}
         run: |
           ROS7=`curl https://download.mikrotik.com/routeros/NEWESTa7.${{matrix.channel}} | awk '{print $1}'`
           echo "ROSVER=$ROS7" >> $GITHUB_ENV
