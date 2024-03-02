@@ -33,13 +33,13 @@ jobs:
         if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
       - name: Set version if release channel name
         id: get-version
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') }}
         run: |
           ROS7=`curl https://download.mikrotik.com/routeros/NEWESTa7.${{matrix.channel}} | awk '{print $1}'`
           echo "ROSVER=$ROS7" >> $GITHUB_ENV
       - name: Set version based on manually triggered build
         id: get-version-custom
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
+        if: ${{ github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         run: |
           echo "ROSVER=${{ github.event.inputs.version }}" >> $GITHUB_ENV
       - name: Print versions for debugging
