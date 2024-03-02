@@ -70,10 +70,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: Build${{ github.run_id }}-${{matrix.channel}} # ${{ github.ref }}
-          release_name: CHR ${{ env.ROSVER }} 
+          release_name: ${{ env.ROSVER }} 
           body: |
-            UEFI-enabled CHR images (RAW and VMDK) 
-            ${{ env.ROSVER }} (${{ matrix.channel }}) [ ${{ github.run_id }} ]
+            UEFI-enabled CHR images, built by GitHub
+            
+            `chr-${{ env.ROSVER }}.uefi-fat.raw` for VirtIO-based hypervisors 
+            `chr-${{ env.ROSVER }}.uefi-fat.vmdk` for VMWare (with UEFI BIOS in VMX file)
+            
+            Optionally, there is a chr-extra-packages disk image with the extra packages that can be mounted 
+
+            *Verison:*  **${{ env.ROSVER }} (${{ matrix.channel }})** [ Build ${{ github.run_id }} ]
           draft: false
           prerelease: true
       - name: Upload CHR RAW image to release
