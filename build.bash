@@ -6,6 +6,8 @@
 
 #for ROSVER in $ROS7 $ROS7testing ;
 #do
+
+ROSVER=$1
 wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr.img.zip
 unzip -p /tmp/chr.img.zip > /tmp/chr.img
 rm -rf  chr.qcow2

@@ -48,7 +48,7 @@ jobs:
           echo "Build using $ROSVER"  
       - name: Run script to download and modify the CHR images
         if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
-        run: sudo bash build.bash
+        run: sudo bash build.bash $ROSVER
       - name: Upload created image files as artifacts of build
         if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
         uses: actions/upload-artifact@v2
