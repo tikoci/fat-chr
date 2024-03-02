@@ -8,13 +8,13 @@
 #do
 
 ROSVER=$1
-wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr.img.zip
-unzip -p /tmp/chr.img.zip > /tmp/chr.img
-rm -rf  chr.qcow2
-qemu-img convert -f raw -O qcow2 /tmp/chr.img chr.qcow2
-rm -rf /tmp/chr.im*
+wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr-$ROSVER.img.zip
+unzip -p /tmp/chr-$ROSVER.img.zip > /tmp/chr-$ROSVER.img
+rm -rf  chr-$ROSVER.qcow2
+qemu-img convert -f raw -O qcow2 /tmp/chr.img chr-$ROSVER.qcow2
+rm -rf /tmp/chr-$ROSVER.im*
 modprobe nbd
-qemu-nbd -c /dev/nbd0 chr.qcow2
+qemu-nbd -c /dev/nbd0 chr-$ROSVER.qcow2
 rm -rf /tmp/tmp*
 mkdir /tmp/tmpmount/
 mkdir /tmp/tmpefipart/
