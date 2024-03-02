@@ -8,9 +8,29 @@ on:
   schedule:
     - cron: '0 0 * * 1'  # Run every Monday at midnight UTC
   workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: string
+        default: "7.14"
     
 
 jobs:
+  strategy:
+    matrix:
+      channel: [stable, longterm, testing, dev]
+      include: 
+        - channel: custom
+          if: ${{ github.event_name == 'workflow_dispatch' }}
+      exclude:
+        - channel: dev
+        - channel: longterm
+        - channel: stable
+          if: ${{ github.event_name != 'workflow_dispatch' }}
+        - channel: testing
+          if: ${{ github.event_name != 'workflow_dispatch' }}
+
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +38,20 @@ jobs:
         uses: actions/checkout@v2
       - name: Install packages into building machine
         run: sudo apt-get install -y unzip qemu-utils rsync gdisk
+      - name: Set version if release channel name
+        id: get-version
+        if: ${{ matrix.channel != 'custom' }}
+        run: |
+          ROS7=`curl https://download.mikrotik.com/routeros/NEWESTa7.${{matrix.channel}} | awk '{print $1}'`
+          echo "ROSVER=$ROS7" >> $GITHUB_ENV
+      - name: Set version if custom version
+        id: get-version-custom
+        if: ${{ matrix.channel == 'custom' }}
+        run: |
+          echo "ROSVER=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+      - name: Print versions for debugging
+        run: |
+          echo "Build using $ROSVER"  
       - name: Run script to download and modify the CHR images
         run: sudo bash build.bash
       - name: Upload created image files as artifacts of build
@@ -25,24 +59,11 @@ jobs:
         with:
           name: build-artifacts
           path: ./chr*
-      - name: Get RouterOS version number
-        id: get-versions
-        run: |
-          ROSTEST=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
-          ROSSTABLE=`curl https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}'`
-          echo "stable=$ROSSTABLE" >> $GITHUB_OUTPUT
-          echo "testing=$ROSTEST" >> $GITHUB_OUTPUT
-          echo "stable=$ROSSTABLE"
-          echo "testing=$ROSTEST"
-      - name: Print versions for debugging
-        run: |
-          echo "The latest stable version is ${{ steps.get-versions.outputs.stable }}"
-          echo "The latest testing version is ${{ steps.get-versions.outputs.testing }}"
       - name: Push git tag to save builder's code (required for release)
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git tag Build${{ github.run_id }}
+          git tag Build${{ github.run_id }}-${{matrix.channel}}
           git push origin Build${{ github.run_id }}
       - name: Create GitHub release
         id: create-release
@@ -50,14 +71,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: Build${{ github.run_id }} # ${{ github.ref }}
-          release_name: ${{ steps.get-versions.outputs.testing }} / ${{ steps.get-versions.outputs.stable }} (Build${{ github.run_id }})
+          tag_name: Build${{ github.run_id }}-${{matrix.channel}} # ${{ github.ref }}
+          release_name: ${{ env.ROSVER }}
           body: |
-            UEFI-enabled CHR images from builder ${{ github.run_id }} -
-            testing: ${{ steps.get-versions.outputs.testing }}
-            stable: ${{ steps.get-versions.outputs.stable }}
-          draft: false
-          prerelease: false
+            UEFI-enabled CHR image from builder ${{ github.run_id }}
+            for ${{ env.ROSVER }}
+          draft: true
+          prerelease: true
       - name: Upload CHR TESTING image to release
         id: upload-release-asset-testing
         uses: actions/upload-release-asset@v1
@@ -65,18 +85,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.raw
-          asset_name: chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.raw
-          asset_content_type: application/octet-stream
-      - name: Upload CHR STABLE image to release
-        id: upload-release-asset-stable
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.raw
-          asset_name: chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.raw
+          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.raw
+          asset_name: chr-${{  env.ROSVER  }}.uefi-fat.raw
           asset_content_type: application/octet-stream
       - name: Upload VMDK CHR TESTING image to release
         id: upload-release-asset-testing-vmdk
@@ -85,16 +95,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.vmdk
-          asset_name: chr-${{ steps.get-versions.outputs.testing }}.uefi-fat.vmdk
-          asset_content_type: application/octet-stream
-      - name: Upload VMDK CHR STABLE image to release
-        id: upload-release-asset-stable-vmdk
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.vmdk
-          asset_name: chr-${{ steps.get-versions.outputs.stable }}.uefi-fat.vmdk
+          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.vmdk
+          asset_name: chr-${{  env.ROSVER  }}.uefi-fat.vmdk
           asset_content_type: application/octet-stream

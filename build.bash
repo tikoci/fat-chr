@@ -1,11 +1,11 @@
 #!/bin/bash
-ROS7=`curl https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}'`
-ROS7testing=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
-ROS7longterm=`curl https://download.mikrotik.com/routeros/NEWESTa7.long-term | awk '{print $1}'`
-ROS7dev=`curl https://download.mikrotik.com/routeros/NEWESTa7.development | awk '{print $1}'`
+#ROS7=`curl https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}'`
+#ROS7testing=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
+#ROS7longterm=`curl https://download.mikrotik.com/routeros/NEWESTa7.long-term | awk '{print $1}'`
+#ROS7dev=`curl https://download.mikrotik.com/routeros/NEWESTa7.development | awk '{print $1}'`
 
-for ROSVER in $ROS7 $ROS7testing ;
-do
+#for ROSVER in $ROS7 $ROS7testing ;
+#do
 wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr.img.zip
 unzip -p /tmp/chr.img.zip > /tmp/chr.img
 rm -rf  chr.qcow2
@@ -48,4 +48,4 @@ echo "created file chr.vmdk too"
 qemu-img convert -O vmdk chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.vmdk
 echo "*** created chr-$ROSVER.uefi-fat for RAW and VMDK"
 sleep 1
-done
+#done
