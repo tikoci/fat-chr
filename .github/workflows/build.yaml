@@ -26,10 +26,10 @@ jobs:
           - channel: longterm
     steps:
       - name: Checkout code
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         uses: actions/checkout@v2
       - name: Install packages into building machine
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         run: sudo apt-get install -y unzip qemu-utils rsync gdisk
       - name: Set version if release channel name
         id: get-version
@@ -43,27 +43,27 @@ jobs:
         run: |
           echo "ROSVER=${{ github.event.inputs.version }}" >> $GITHUB_ENV
       - name: Print versions for debugging
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         run: |
           echo "Build using $ROSVER"  
       - name: Run script to download and modify the CHR images
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         run: sudo bash build.bash
       - name: Upload created image files as artifacts of build
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         uses: actions/upload-artifact@v2
         with:
           name: build-artifacts
           path: ./chr*
       - name: Push git tag to save builder's code (required for release)
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
           git tag Build${{ github.run_id }}-${{matrix.channel}}
           git push origin Build${{ github.run_id }}-${{matrix.channel}}
       - name: Create GitHub release
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         id: create-release
         uses: actions/create-release@v1 # comnoco/create-release-action@v2.0.5
         env:
@@ -77,7 +77,7 @@ jobs:
           draft: true
           prerelease: true
       - name: Upload CHR TESTING image to release
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         id: upload-release-asset-raw
         uses: actions/upload-release-asset@v1
         env:
@@ -88,7 +88,7 @@ jobs:
           asset_name: chr-${{  env.ROSVER  }}.uefi-fat.raw
           asset_content_type: application/octet-stream
       - name: Upload VMDK CHR TESTING image to release
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != "custom") || ( github.event_name == 'workflow_dispatch' && matrix.channel == "custom"  }}
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  }}
         id: upload-release-asset-vmdk
         uses: actions/upload-release-asset@v1
         env:
