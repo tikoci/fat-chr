@@ -16,23 +16,21 @@ on:
     
 
 jobs:
-  strategy:
-    matrix:
-      channel: [stable, longterm, testing, dev]
-      include: 
-        - channel: custom
-          if: ${{ github.event_name == 'workflow_dispatch' }}
-      exclude:
-        - channel: dev
-        - channel: longterm
-        - channel: stable
-          if: ${{ github.event_name != 'workflow_dispatch' }}
-        - channel: testing
-          if: ${{ github.event_name != 'workflow_dispatch' }}
-
-
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        channel: [stable, longterm, testing, dev]
+        include: 
+          - channel: custom
+            if: ${{ github.event_name == 'workflow_dispatch' }}
+        exclude:
+          - channel: dev
+          - channel: longterm
+          - channel: stable
+            if: ${{ github.event_name != 'workflow_dispatch' }}
+          - channel: testing
+            if: ${{ github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
