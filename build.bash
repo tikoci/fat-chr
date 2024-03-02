@@ -44,10 +44,31 @@ echo w # write changes to disk
 echo y # confirm
 ) | gdisk /dev/nbd0
 qemu-nbd -d /dev/nbd0
+
 echo "created file chr.qcow2, now back to raw but uncompressed..."
 qemu-img convert -f qcow2 -O raw chr.qcow2 chr-$ROSVER.uefi-fat.raw
+
 echo "created file chr.vmdk too"
 qemu-img convert -O vmdk chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.vmdk
+
 echo "*** created chr-$ROSVER.uefi-fat for RAW and VMDK"
+
+sleep 1
+
+echo "downloading extra-packages"
+wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/all_packages-x86-$ROSVER.zip -O /tmp/all_packages-x86-$ROSVER.zip
+mkdir /tmp/all_packages-x86-$ROSVER
+unzip /tmp/all_packages-x86-$ROSVER.zip -d /tmp/all_packages-x86-$ROSVER
+echo "create disk image with extra-packages for mounting"
+mkdir /tmp/tmpmntpkg
+qemu-img create -f raw chr-extra-packages-$ROSVER.img 16M
+mkfs.vfat chr-extra-packages-$ROSVER.img
+mount -o loop chr-extra-packages-$ROSVER.img /tmp/tmpmntpkg
+cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
+umount /tmp/tmpmntpkg
+echo "created file chr.vmdk for extra packages too"
+qemu-img convert -O vmdk chr-extra-packages-$ROSVER.img chr-extra-packages-$ROSVER.vmdk
+
+echo "*** done "
 sleep 1
 #done
