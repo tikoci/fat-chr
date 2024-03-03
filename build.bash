@@ -66,6 +66,7 @@ qemu-img create -f raw chr-extra-packages-$ROSVER.ext3.img 16M
 mkfs.ext3 chr-extra-packages-$ROSVER.ext3.img
 mount -o loop chr-extra-packages-$ROSVER.ext3.img /tmp/tmpmntpkg
 cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
+chmod a-w /tmp/tmpmntpkg/*
 umount /tmp/tmpmntpkg
 
 echo "created file chr.vmdk for extra packages too"
@@ -73,7 +74,7 @@ qemu-img convert -O vmdk chr-extra-packages-$ROSVER.ext3.img chr-extra-packages-
 
 echo "build CDROM image"
 #genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
-mkisofs -R -J -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
+mkisofs -J -l -R -V "chrextra" -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
 echo "*** done "
 sleep 1
 #done
