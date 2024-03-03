@@ -59,17 +59,21 @@ echo "downloading extra-packages"
 wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/all_packages-x86-$ROSVER.zip -O /tmp/all_packages-x86-$ROSVER.zip
 mkdir /tmp/all_packages-x86-$ROSVER
 unzip /tmp/all_packages-x86-$ROSVER.zip -d /tmp/all_packages-x86-$ROSVER
+
 echo "create disk image with extra-packages for mounting"
 mkdir /tmp/tmpmntpkg
-qemu-img create -f raw chr-extra-packages-$ROSVER.raw 16M
-mkfs.vfat chr-extra-packages-$ROSVER.raw
-mount -o loop chr-extra-packages-$ROSVER.raw /tmp/tmpmntpkg
+qemu-img create -f raw chr-extra-packages-$ROSVER.ext3.img 16M
+mkfs.ext3 chr-extra-packages-$ROSVER.ext3.img
+mount -o loop chr-extra-packages-$ROSVER.ext3.img /tmp/tmpmntpkg
 cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
 umount /tmp/tmpmntpkg
+
 echo "created file chr.vmdk for extra packages too"
-qemu-img convert -O vmdk chr-extra-packages-$ROSVER.raw chr-extra-packages-$ROSVER.vmdk
+qemu-img convert -O vmdk chr-extra-packages-$ROSVER.ext3.img chr-extra-packages-$ROSVER.ext3.vmdk
+
 echo "build CDROM image"
-genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
+#genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
+mkisofs -R -J -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
 echo "*** done "
 sleep 1
 #done

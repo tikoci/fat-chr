@@ -112,8 +112,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}.raw
-          asset_name: chr-extra-packages-${{  env.ROSVER  }}.raw
+          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}.ext3.img
+          asset_name: chr-extra-packages-${{  env.ROSVER  }}.ext3.img
           asset_content_type: application/octet-stream
       - name: Upload CHR extra-packages image to release (VMDK)
         id: upload-release-asset-extra-packages-vmdk
@@ -123,8 +123,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}.vmdk
-          asset_name: chr-extra-packages-${{  env.ROSVER  }}.vmdk
+          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}.ext3.vmdk
+          asset_name: extra-packages-${{  env.ROSVER  }}.ext3.vmdk
           asset_content_type: application/octet-stream
       - name: Upload CHR extra-packages image to release (ISO)
         id: upload-release-asset-extra-packages-iso
