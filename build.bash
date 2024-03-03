@@ -72,11 +72,11 @@ chmod a-w /tmp/tmpmntpkg/*
 umount /tmp/tmpmntpkg
 
 echo "created file chr.vmdk for extra packages too"
-qemu-img convert -O vmdk chr-extra-packages-$ROSVER.vfat.img chr-extra-packages-$ROSVER.vmdk
+qemu-img convert -O vmdk chr-extra-packages-$ROSVER.img chr-extra-packages-$ROSVER.vmdk
 
 echo "build CDROM image"
-#genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
-mkisofs -R -l -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
+#genisoimage -l -J -R -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER
+mkisofs -R -J -l -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
 echo "*** done "
 sleep 1
 #done
