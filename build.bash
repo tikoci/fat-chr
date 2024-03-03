@@ -74,7 +74,7 @@ qemu-img convert -O vmdk chr-extra-packages-$ROSVER.ext3.img chr-extra-packages-
 
 echo "build CDROM image"
 #genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
-mkisofs -J -l -R -V "chrextra" -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
+mkisofs -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
 echo "*** done "
 sleep 1
 #done
