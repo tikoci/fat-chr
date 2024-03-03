@@ -62,19 +62,21 @@ unzip /tmp/all_packages-x86-$ROSVER.zip -d /tmp/all_packages-x86-$ROSVER
 
 echo "create disk image with extra-packages for mounting"
 mkdir /tmp/tmpmntpkg
-qemu-img create -f raw chr-extra-packages-$ROSVER.ext3.img 16M
-mkfs.ext3 chr-extra-packages-$ROSVER.ext3.img
-mount -o loop chr-extra-packages-$ROSVER.ext3.img /tmp/tmpmntpkg
+qemu-img create -f raw chr-extra-packages-$ROSVER.img 16M
+parted chr-extra-packages-$ROSVER.img mklabel msdos
+parted chr-extra-packages-$ROSVER.img mkpart primary fat32 1MiB 100%
+mkfs.fat -F32 chr-extra-packages-$ROSVER.img
+mount -o loop chr-extra-packages-$ROSVER.img /tmp/tmpmntpkg
 cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
 chmod a-w /tmp/tmpmntpkg/*
 umount /tmp/tmpmntpkg
 
 echo "created file chr.vmdk for extra packages too"
-qemu-img convert -O vmdk chr-extra-packages-$ROSVER.ext3.img chr-extra-packages-$ROSVER.ext3.vmdk
+qemu-img convert -O vmdk chr-extra-packages-$ROSVER.vfat.img chr-extra-packages-$ROSVER.vmdk
 
 echo "build CDROM image"
 #genisoimage -o chr-extra-packages-$ROSVER.iso -r -J /tmp/all_packages-x86-$ROSVER
-mkisofs -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
+mkisofs -R -l -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
 echo "*** done "
 sleep 1
 #done
