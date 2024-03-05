@@ -13,19 +13,32 @@ unzip -p /tmp/chr-$ROSVER.img.zip > /tmp/chr-$ROSVER.img
 rm -rf  chr-$ROSVER.qcow2
 qemu-img convert -f raw -O qcow2 /tmp/chr-$ROSVER.img chr-$ROSVER.qcow2
 rm -rf /tmp/chr-$ROSVER.im*
+
+
 modprobe nbd
 qemu-nbd -c /dev/nbd0 chr-$ROSVER.qcow2
+
 rm -rf /tmp/tmp*
+
 mkdir /tmp/tmpmount/
+mkdir diskfiles
+
 mkdir /tmp/tmpefipart/
 mount /dev/nbd0p1 /tmp/tmpmount/
 rsync -a /tmp/tmpmount/ /tmp/tmpefipart/
+mkdir diskfiles/part1
+rsync -a /tmp/tmpmount/ ./diskfiles/part1/
 umount /dev/nbd0p1
+
 mkfs -t fat /dev/nbd0p1
 mount /dev/nbd0p1 /tmp/tmpmount/
 rsync -a /tmp/tmpefipart/ /tmp/tmpmount/
+mkdir diskfiles/part2
+rsync -a /tmp/tmpefipart/ ./diskfiles/part2/
 umount /dev/nbd0p1
+
 rm -rf /tmp/tmp*
+
 (
 echo 2 # use GPT
 echo t # change partition code
@@ -51,11 +64,12 @@ qemu-img convert -f qcow2 -O raw chr-$ROSVER.qcow2 chr-$ROSVER.uefi-fat.raw
 echo "created file chr.vmdk too"
 qemu-img convert -O vmdk chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.vmdk
 
-echo "created file chr.dmg (for debuging)"
+
+echo "created file ZIP with raw files (for debuging)"
 # docs say dmg is not a valid OUTPUT...
 #qemu-img convert -O dmg chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.dmg
-# using libhfsplus instead...
-dmg create -format UDZO -src chr-$ROSVER.uefi-fat.raw -tgt chr-$ROSVER.uefi-fat.dmg
+# tried using hfsplus instead... also not as easy
+zip -r partition-debug-$ROSVER.zip diskfiles
 
 echo "*** created chr-$ROSVER.uefi-fat for RAW and VMDK"
 
