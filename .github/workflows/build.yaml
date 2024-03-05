@@ -79,7 +79,7 @@ jobs:
             
             Optionally, there is a CHR "extra-packages" disk images that can be mounted to more easily add them.
             
-            For debugging on MacOS, a `chr-${{ env.ROSVER }}.uefi-fat.vmdk` so the disk image can be viewed using Apple's tools.
+            For debugging, a `partition-debug--${{ env.ROSVER }}.zip` so the disk image can be viewed using Apple's tools.
 
             *Verison:*  **${{ env.ROSVER }} (${{ matrix.channel }})** [ Build ${{ github.run_id }} ]
           draft: false
