@@ -77,7 +77,9 @@ jobs:
             `chr-${{ env.ROSVER }}.uefi-fat.raw` for VirtIO-based hypervisors 
             `chr-${{ env.ROSVER }}.uefi-fat.vmdk` for VMWare (with UEFI BIOS in VMX file)
             
-            Optionally, there is a chr-extra-packages disk image with the extra packages that can be mounted 
+            Optionally, there is a CHR "extra-packages" disk images that can be mounted to more easily add them.
+            
+            For debugging on MacOS, a `chr-${{ env.ROSVER }}.uefi-fat.vmdk` so the disk image can be viewed using Apple's tools.
 
             *Verison:*  **${{ env.ROSVER }} (${{ matrix.channel }})** [ Build ${{ github.run_id }} ]
           draft: false
@@ -103,6 +105,17 @@ jobs:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.vmdk
           asset_name: chr-${{  env.ROSVER  }}.uefi-fat.vmdk
+          asset_content_type: application/octet-stream
+      - name: Upload CHR VMDK image to release
+        id: upload-release-asset-dmg
+        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.dmg
+          asset_name: chr-${{  env.ROSVER  }}.uefi-fat.dmg
           asset_content_type: application/octet-stream
       - name: Upload CHR extra-packages image to release (RAW)
         id: upload-release-asset-extra-packages-raw
