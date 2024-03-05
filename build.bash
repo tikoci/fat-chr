@@ -52,7 +52,10 @@ echo "created file chr.vmdk too"
 qemu-img convert -O vmdk chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.vmdk
 
 echo "created file chr.dmg (for debuging)"
-qemu-img convert -O dmg chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.dmg
+# docs say dmg is not a valid OUTPUT...
+#qemu-img convert -O dmg chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.dmg
+# using libhfsplus instead...
+dmg create -format UDZO -src chr-$ROSVER.uefi-fat.raw -tgt chr-$ROSVER.uefi-fat.dmg
 
 echo "*** created chr-$ROSVER.uefi-fat for RAW and VMDK"
 
