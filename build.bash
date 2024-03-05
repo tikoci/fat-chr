@@ -26,16 +26,19 @@ mkdir diskfiles
 mkdir /tmp/tmpefipart/
 mount /dev/nbd0p1 /tmp/tmpmount/
 rsync -a /tmp/tmpmount/ /tmp/tmpefipart/
-mkdir diskfiles/part1
-rsync -a /tmp/tmpmount/ ./diskfiles/part1/
 umount /dev/nbd0p1
 
 mkfs -t fat /dev/nbd0p1
 mount /dev/nbd0p1 /tmp/tmpmount/
 rsync -a /tmp/tmpefipart/ /tmp/tmpmount/
-mkdir diskfiles/part2
-rsync -a /tmp/tmpefipart/ ./diskfiles/part2/
+mkdir diskfiles/part1
+rsync -a /tmp/tmpefipart/ ./diskfiles/part1/
 umount /dev/nbd0p1
+
+mount /dev/nbd0p2 /tmp/tmpmount/
+mkdir diskfiles/part2
+rsync -a /tmp/tmpmount/ ./diskfiles/part2/
+umount /dev/nbd0p2
 
 rm -rf /tmp/tmp*
 
