@@ -10,7 +10,7 @@ Non-EUFI raw images for "stable" and "testing" for latest version are downloaded
 * **CI builder** https://github.com/tikoci/fat-chr/blob/main/.github/workflows/build.yaml
 * **Raw Image Converter Script** https://github.com/tikoci/fat-chr/blob/main/build.bash
 
-Any git change in script/workflow will trigger a build.  There is also "workflow_dispatch" on the "Build and Release" to manual trigger a specific build to fetch older/specific verisons.  New builds are done weekly via "cron" on Monday.  All builds marked as "pre-release" in Releases and must be manually changed to remove the flag. No check is done if a verision was already build, so duplicates can be deleted manually.  
+Any git change in script/workflow will trigger a build.  There is also "workflow_dispatch" on the "Build and Release" to manual trigger a specific build to fetch older/specific verisons.  All builds marked as "pre-release" in Releases and must be manually changed to remove the flag. No check is done if a verision was already build, so duplicates can be deleted manually.  
 
 ## Credits 
 [@kriszos's posting](https://forum.mikrotik.com/viewtopic.php?p=1025068&hilit=UEFI#p933799) on the Mikrotik forum which had a bash script to convert the CHR raw image from EXT2 to FAT16 script.
