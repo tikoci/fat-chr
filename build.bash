@@ -42,23 +42,52 @@ umount /dev/nbd0p2
 
 rm -rf /tmp/tmp*
 
+# @kriszos approach
+# (
+# echo 2 # use GPT
+# echo t # change partition code
+# echo 1 # select first partition
+# echo 8300 # change code to Linux filesystem 8300
+# echo r # Recovery/transformation
+# echo h # Hybrid MBR
+# echo 1 2 # partitions added to the hybrid MBR
+# echo n # Place EFI GPT (0xEE) partition first in MBR (good for GRUB)? (Y/N)
+# echo   # Enter an MBR hex code (default 83)
+# echo y # Set the bootable flag? (Y/N)
+# echo   # Enter an MBR hex code (default 83)
+# echo n # Set the bootable flag? (Y/N)
+# echo n # Unused partition space(s) found. Use one to protect more partitions? (Y/N)
+# echo w # write changes to disk
+# echo y # confirm
+# ) | gdisk /dev/nbd0
+
+# @jaclaz
 (
 echo 2 # use GPT
+echo x # extra functionality
+echo e # relocate backup data structures to the end of the disk
+echo r # Recovery/transformation
+echo f # load MBR and build fresh GPT from it
+echo y # Warning! This will destroy the currently defined partitions! Proceed? (Y/N):
+echo x # extra functionality
+echo a # set attributes
+echo 1 #  Partition number (1-2):
+echo 2 # Toggle which attribute field (0-63, 64 or <Enter> to exit):
+echo   # Toggle which attribute field (0-63, 64 or <Enter> to exit):
+echo m # return to main menu
 echo t # change partition code
 echo 1 # select first partition
-echo 8300 # change code to Linux filesystem 8300
-echo r # Recovery/transformation
-echo h # Hybrid MBR
-echo 1 2 # partitions added to the hybrid MBR
-echo n # Place EFI GPT (0xEE) partition first in MBR (good for GRUB)? (Y/N)
-echo   # Enter an MBR hex code (default 83)
-echo y # Set the bootable flag? (Y/N)
-echo   # Enter an MBR hex code (default 83)
-echo n # Set the bootable flag? (Y/N)
-echo n # Unused partition space(s) found. Use one to protect more partitions? (Y/N)
+echo EF00 # Hex code or GUID (L to show codes, Enter = EF00):
+echo c # change a partition's name
+echo 1 #  Partition number (1-2):
+echo RouterOS Boot # Enter name:
+echo c # change a partition's name
+echo 2 #  Partition number (1-2):
+echo RouterOS # Enter name:
 echo w # write changes to disk
 echo y # confirm
 ) | gdisk /dev/nbd0
+
 qemu-nbd -d /dev/nbd0
 
 echo "created file chr.qcow2, now back to raw but uncompressed..."
