@@ -17,6 +17,8 @@ rm -rf /tmp/chr-$ROSVER.im*
 
 modprobe nbd
 qemu-nbd -c /dev/nbd0 chr-$ROSVER.qcow2
+echo "/dev..."
+ls /dev
 
 rm -rf /tmp/tmp*
 
@@ -39,10 +41,15 @@ mount /dev/nbd0p2 /tmp/tmpmount/
 mkdir diskfiles/part2
 rsync -a /tmp/tmpmount/ ./diskfiles/part2/
 umount /dev/nbd0p2
-
+echo "/tmp..."
+ls /tmp
+echo "/diskfiles..."
+ls diskfiles
 rm -rf /tmp/tmp*
 
+echo "unmount orginal image"
 qemu-nbd -d /dev/nbd0
+sleep 2
 
 echo "created file chr.qcow2, now back to raw but uncompressed..."
 qemu-img convert -f qcow2 -O raw chr-$ROSVER.qcow2 chr-$ROSVER.uefi-fat.raw
