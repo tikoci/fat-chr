@@ -1,4 +1,4 @@
-name: Matrix Build and Release
+name: Old Matrix Build
 permissions: write-all
 
 on:
@@ -76,12 +76,12 @@ jobs:
           body: |
             UEFI-enabled CHR images, built by GitHub
             
-            `chr-${{ env.ROSVER }}.uefi-fat.raw` for VirtIO-based hypervisors 
-            `chr-${{ env.ROSVER }}.uefi-fat.vmdk` for VMWare (with UEFI BIOS in VMX file)
+            `chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.raw` for VirtIO-based hypervisors 
+            `chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.vmdk` for VMWare (with UEFI BIOS in VMX file)
             
             Optionally, there is a CHR "extra-packages" disk images that can be mounted to more easily add them.
             
-            For debugging, a `partition-debug--${{ env.ROSVER }}.zip` so the disk image can be viewed using Apple's tools.
+            For debugging, a `partition-debug--${{ env.ROSVER }}-${{ github.event.inputs.script }}.zip` so the disk image can be viewed using Apple's tools.
 
             *Verison:*  **${{ env.ROSVER }} (${{ matrix.channel }})** [ Build ${{ github.run_id }} ]
           draft: false
@@ -94,8 +94,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.raw
-          asset_name: chr-${{  env.ROSVER  }}.uefi-fat.raw
+          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat-${{ github.event.inputs.script }}.raw
+          asset_name: chr-${{  env.ROSVER  }}.uefi-fat-${{ github.event.inputs.script }}.raw
           asset_content_type: application/octet-stream
       - name: Upload CHR VMDK image to release
         id: upload-release-asset-vmdk
