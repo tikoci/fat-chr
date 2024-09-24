@@ -23,7 +23,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip qemu-utils rsync gdisk dosfstools parted genisoimage zip
-        if: ${{ (github.event_name != 'workflow_dispatch' && matrix.channel != 'custom') || ( github.event_name == 'workflow_dispatch' && matrix.channel == 'custom'  )}}
       - name: Set version based on manually triggered build
         id: get-version-custom
         run: |
@@ -42,15 +41,15 @@ jobs:
         run: |
           git config user.name "GitHub Actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git tag Build${{ github.run_id }}-${{matrix.channel}}
-          git push origin Build${{ github.run_id }}-${{matrix.channel}}
+          git tag Build${{ github.run_id }}-${{github.event.inputs.script}}
+          git push origin Build${{ github.run_id }}-${{github.event.inputs.script}}
       - name: Create GitHub release
         id: create-release
         uses: actions/create-release@v1 # comnoco/create-release-action@v2.0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: Build${{ github.run_id }}-${{matrix.channel}} # ${{ github.ref }}
+          tag_name: Build${{ github.run_id }}-${{github.event.inputs.script}} # ${{ github.ref }}
           release_name: ${{ env.ROSVER }}-${{ github.event.inputs.script }} 
           body: |
             UEFI-enabled CHR images, built by GitHub
@@ -62,7 +61,7 @@ jobs:
             
             For debugging, a `partition-debug--${{ env.ROSVER }}.zip` so the disk image can be viewed using Apple's tools.
 
-            *Verison:*  **${{ env.ROSVER }} (${{ matrix.channel }})** [ Build ${{ github.run_id }} ]
+            *Verison:*  **${{ env.ROSVER }} (${{ github.event.inputs.script }})** [ Build ${{ github.run_id }} ]
           draft: false
           prerelease: true
       - name: Upload CHR RAW image to release
