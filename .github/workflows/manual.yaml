@@ -72,7 +72,7 @@ jobs:
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.raw
-          asset_name: chr-${{  env.ROSVER  }}.uefi-fat.raw
+          asset_name: chr-${{  env.ROSVER  }}.uefi-fat-${{ github.event.inputs.script }}.raw
           asset_content_type: application/octet-stream
       - name: Upload CHR VMDK image to release
         id: upload-release-asset-vmdk
@@ -82,7 +82,7 @@ jobs:
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.vmdk
-          asset_name: chr-${{  env.ROSVER  }}.uefi-fat.vmdk
+          asset_name: chr-${{  env.ROSVER  }}.uefi-fat-${{ github.event.inputs.script }}.vmdk
           asset_content_type: application/octet-stream
       - name: Upload ZIP for debugging files on each paritition
         id: upload-release-asset-partition-debug-zip
@@ -92,7 +92,7 @@ jobs:
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_path: ./partition-debug-${{  env.ROSVER  }}.zip
-          asset_name: partition-debug-${{  env.ROSVER  }}.zip
+          asset_name: partition-debug-${{  env.ROSVER  }}-${{ github.event.inputs.script }}.zip
           asset_content_type: application/octet-stream
       - name: Upload CHR extra-packages image to release (RAW)
         id: upload-release-asset-extra-packages-raw
