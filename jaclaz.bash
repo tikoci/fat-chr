@@ -1,0 +1,152 @@
+#!/bin/bash
+#ROS7=`curl https://download.mikrotik.com/routeros/NEWESTa7.stable | awk '{print $1}'`
+#ROS7testing=`curl https://download.mikrotik.com/routeros/NEWESTa7.testing | awk '{print $1}'`
+#ROS7longterm=`curl https://download.mikrotik.com/routeros/NEWESTa7.long-term | awk '{print $1}'`
+#ROS7dev=`curl https://download.mikrotik.com/routeros/NEWESTa7.development | awk '{print $1}'`
+
+#for ROSVER in $ROS7 $ROS7testing ;
+#do
+
+ROSVER=$1
+wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr-$ROSVER.img.zip
+unzip -p /tmp/chr-$ROSVER.img.zip > /tmp/chr-$ROSVER.img
+rm -rf  chr-$ROSVER.qcow2
+qemu-img convert -f raw -O qcow2 /tmp/chr-$ROSVER.img chr-$ROSVER.qcow2
+rm -rf /tmp/chr-$ROSVER.im*
+
+
+modprobe nbd
+qemu-nbd -c /dev/nbd0 chr-$ROSVER.qcow2
+
+rm -rf /tmp/tmp*
+
+mkdir /tmp/tmpmount/
+mkdir diskfiles
+
+mkdir /tmp/tmpefipart/
+mount /dev/nbd0p1 /tmp/tmpmount/
+rsync -a /tmp/tmpmount/ /tmp/tmpefipart/
+mkdir diskfiles/part1
+rsync -a /tmp/tmpmount/ ./diskfiles/part1/
+umount /dev/nbd0p1
+
+mkfs -t fat /dev/nbd0p1
+mount /dev/nbd0p1 /tmp/tmpmount/
+rsync -a /tmp/tmpefipart/ /tmp/tmpmount/
+umount /dev/nbd0p1
+
+mount /dev/nbd0p2 /tmp/tmpmount/
+mkdir diskfiles/part2
+rsync -a /tmp/tmpmount/ ./diskfiles/part2/
+umount /dev/nbd0p2
+
+rm -rf /tmp/tmp*
+
+
+# @jaclaz, first version
+# (
+# echo 2 # use GPT
+# echo x # extra functionality
+# echo e # relocate backup data structures to the end of the disk
+# echo r # Recovery/transformation
+# echo f # load MBR and build fresh GPT from it
+# echo y # Warning! This will destroy the currently defined partitions! Proceed? (Y/N):
+# echo x # extra functionality
+# echo a # set attributes
+# echo 1 #  Partition number (1-2):
+# echo 2 # Toggle which attribute field (0-63, 64 or <Enter> to exit):
+# echo   # Toggle which attribute field (0-63, 64 or <Enter> to exit):
+# echo m # return to main menu
+# echo t # change partition code
+# echo 1 # select first partition
+# echo EF00 # Hex code or GUID (L to show codes, Enter = EF00):
+# echo c # change a partition's name
+# echo 1 #  Partition number (1-2):
+# echo RouterOS Boot # Enter name:
+# echo c # change a partition's name
+# echo 2 #  Partition number (1-2):
+# echo RouterOS # Enter name:
+# echo w # write changes to disk
+# echo y # confirm
+# ) | gdisk /dev/nbd0
+
+(
+echo 2 # use GPT
+echo x # extra functionality
+echo e # relocate backup data structures to the end of the disk
+echo r # Recovery/transformation
+echo f # load MBR and build fresh GPT from it
+echo y # Warning! This will destroy the currently defined partitions! Proceed? (Y/N):
+echo x # extra functionality
+echo a # set attributes
+echo 1 #  Partition number (1-2):
+echo 2 # Toggle which attribute field (0-63, 64 or <Enter> to exit):
+echo   # Toggle which attribute field (0-63, 64 or <Enter> to exit):
+echo m # return to main menu
+echo t # change partition code
+echo 1 # select first partition
+echo EF00 # Hex code or GUID (L to show codes, Enter = EF00):
+echo c # change a partition's name
+echo 1 #  Partition number (1-2):
+echo RouterOS Boot # Enter name:
+echo c # change a partition's name
+echo 2 #  Partition number (1-2):
+echo RouterOS # Enter name:
+echo x # extra functionality
+echo r # Recovery/transformation
+echo h # Hybrid MBR
+echo 1 2 # partitions added to the hybrid MBR
+echo n # Place EFI GPT (0xEE) partition first in MBR (good for GRUB)? (Y/N)
+echo 83 # Enter an MBR hex code (default 83)
+echo y # Set the bootable flag? (Y/N)
+echo 83 # Enter an MBR hex code (default 83)
+echo n # Set the bootable flag? (Y/N)
+echo n # Unused partition space(s) found. Use one to protect more partitions? (Y/N)
+echo w # write changes to disk
+echo y # confirm
+) | gdisk /dev/nbd0
+
+qemu-nbd -d /dev/nbd0
+
+echo "created file chr.qcow2, now back to raw but uncompressed..."
+qemu-img convert -f qcow2 -O raw chr-$ROSVER.qcow2 chr-$ROSVER.uefi-fat.raw
+
+echo "created file chr.vmdk too"
+qemu-img convert -O vmdk chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.vmdk
+
+
+echo "created file ZIP with raw files (for debuging)"
+# docs say dmg is not a valid OUTPUT...
+#qemu-img convert -O dmg chr-$ROSVER.uefi-fat.raw chr-$ROSVER.uefi-fat.dmg
+# tried using hfsplus instead... also not as easy
+zip -r partition-debug-$ROSVER.zip diskfiles
+
+echo "*** created chr-$ROSVER.uefi-fat for RAW and VMDK"
+
+sleep 1
+
+echo "downloading extra-packages"
+wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/all_packages-x86-$ROSVER.zip -O /tmp/all_packages-x86-$ROSVER.zip
+mkdir /tmp/all_packages-x86-$ROSVER
+unzip /tmp/all_packages-x86-$ROSVER.zip -d /tmp/all_packages-x86-$ROSVER
+
+echo "create disk image with extra-packages for mounting"
+mkdir /tmp/tmpmntpkg
+qemu-img create -f raw chr-extra-packages-$ROSVER.img 16M
+parted chr-extra-packages-$ROSVER.img mklabel msdos
+parted chr-extra-packages-$ROSVER.img mkpart primary fat32 1MiB 100%
+mkfs.fat -F32 chr-extra-packages-$ROSVER.img
+mount -o loop chr-extra-packages-$ROSVER.img /tmp/tmpmntpkg
+cp /tmp/all_packages-x86-$ROSVER/* /tmp/tmpmntpkg
+chmod a-w /tmp/tmpmntpkg/*
+umount /tmp/tmpmntpkg
+
+echo "created file chr.vmdk for extra packages too"
+qemu-img convert -O vmdk chr-extra-packages-$ROSVER.img chr-extra-packages-$ROSVER.vmdk
+
+echo "build CDROM image"
+#genisoimage -l -J -R -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER
+mkisofs -R -J -l -iso-level 4 -o chr-extra-packages-$ROSVER.iso /tmp/all_packages-x86-$ROSVER/
+echo "*** done "
+sleep 1
+#done
