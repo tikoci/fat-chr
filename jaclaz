@@ -130,7 +130,7 @@ echo "*** created chr-$ROSVER.uefi-fat for RAW and VMDK"
 sleep 1
 
 echo "downloading extra-packages"
-wget --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/all_packages-x86-$ROSVER.zip -O /tmp/all_packages-x86-$ROSVER.zip
+wget -nv --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/all_packages-x86-$ROSVER.zip -O /tmp/all_packages-x86-$ROSVER.zip
 mkdir /tmp/all_packages-x86-$ROSVER
 unzip /tmp/all_packages-x86-$ROSVER.zip -d /tmp/all_packages-x86-$ROSVER
 
