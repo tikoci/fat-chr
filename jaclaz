@@ -18,6 +18,8 @@ rm -rf /tmp/chr-$ROSVER.im*
 modprobe nbd
 qemu-nbd -c /dev/nbd0 chr-$ROSVER.qcow2
 
+sleep 5
+
 lsblk
 
 rm -rf /tmp/tmp*
