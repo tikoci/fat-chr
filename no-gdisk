@@ -8,7 +8,7 @@
 #do
 
 ROSVER=$1
-wget --progress=dot --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr-$ROSVER.img.zip
+wget -nv --no-check-certificate https://download.mikrotik.com/routeros/$ROSVER/chr-$ROSVER.img.zip -O /tmp/chr-$ROSVER.img.zip
 unzip -p /tmp/chr-$ROSVER.img.zip > /tmp/chr-$ROSVER.img
 rm -rf  chr-$ROSVER.qcow2
 qemu-img convert -f raw -O qcow2 /tmp/chr-$ROSVER.img chr-$ROSVER.qcow2
