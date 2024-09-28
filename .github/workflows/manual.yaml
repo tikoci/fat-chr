@@ -11,7 +11,7 @@ on:
       script:
         required: true
         type: string
-        default: "build.bash"
+        default: "jaclaz"
 
 jobs:
   build:
@@ -29,7 +29,7 @@ jobs:
           echo "ROSVER=${{ github.event.inputs.version }}" >> $GITHUB_ENV
       - name: Print versions for debugging
         run: |
-          echo "Build using $ROSVER"  
+          echo "Build using $ROSVER with ${{ github.event.inputs.script }} script"  
       - name: Run script to download and modify the CHR images
         run: sudo bash ${{ github.event.inputs.script }} $ROSVER
       - name: Upload created image files as artifacts of build
