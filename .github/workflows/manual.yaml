@@ -54,8 +54,8 @@ jobs:
           body: |
             UEFI-enabled CHR images, built by GitHub
             
-            `chr-${{ env.ROSVER }}.uefi-fat.raw` for VirtIO-based hypervisors 
-            `chr-${{ env.ROSVER }}.uefi-fat.vmdk` for VMWare (with UEFI BIOS in VMX file)
+            `chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.raw` for VirtIO-based hypervisors 
+            `chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.vmdk` for VMWare (with UEFI BIOS in VMX file)
             
             Optionally, there is a CHR "extra-packages" disk images that can be mounted to more easily add them.
             
