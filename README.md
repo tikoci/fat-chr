@@ -2,7 +2,7 @@
 
 *Builder for a UEFI-enabled RouterOS CHR image using GitHub Action.*
 
-> [!INFO]
+> [!TIP]
 > If these images are required on some virtualized platform/cloud, and Mikrotik's official downloads DO NOT WORK on same platform - please let me know either as [issue](https://github.com/tikoci/fat-chr/issues) here or on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=184254) – as I've been collecting data.  The current summary is:
 > * **Apple Virtualization Framework**  On Intel, all images should work.  On ARM-based M1/M2/M3, **none** have been reported to work.  
 > * **Vultr** - Mikrotik images only work because the [instructions suggest SystemRescueCD and `dd`](https://help.mikrotik.com/docs/display/ROS/CHR+Vultr+installation), reported that the "@jaclaz method" (used in all post-7.15 [releases](https://github.com/tikoci/fat-chr/releases) work _without_  Mikrotik's "`dd` approach", see [this post](https://forum.mikrotik.com/viewtopic.php?t=184254&hilit=EUFI#p1100169)
