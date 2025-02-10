@@ -38,7 +38,7 @@ jobs:
         run: sudo bash ${{ github.event.inputs.script }} $ROSVER
 
       - name: Copy re-packaged CHR to RouterOS.utm/Data
-        run: cp chr-${{ env.ROSVER }}.uefi-fat.raw RouterOS/Data/chr-uefi-fat.raw
+        run: cp chr-${{ env.ROSVER }}.uefi-fat.raw ./RouterOS.utm/Data/chr-uefi-fat.raw
       
       - name: Create artifact using RouterOS.utm directory
         uses: actions/upload-artifact@v4
