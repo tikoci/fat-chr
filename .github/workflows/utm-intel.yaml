@@ -37,9 +37,6 @@ jobs:
       - name: Run ${{ github.event.inputs.script }} script to download and modify the CHR images
         run: sudo bash ${{ github.event.inputs.script }} $ROSVER
 
-      - name: "DEBUG: ls"
-        run: ls -Rl
-
       - name: Copy re-packaged CHR to RouterOS.utm/Data
         run: cp chr-${{ env.ROSVER }}.uefi-fat.raw RouterOS/Data/chr-uefi-fat.raw
       
