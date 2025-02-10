@@ -5,7 +5,7 @@
 If you have an Intel Mac, and UTM is already installed, you can install most release release here automatically.  __* Only Intel-based macOS with UTM installed is supported__, currently no support for Apple Silicon-based macOS.
 
 ## Install 
-### Use [Install RouterOS via URL](utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip) to download and install RouterOS automatically
+### Use <a href="utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip">Install RouterOS via URL</a> to download and install RouterOS automatically
 
 #### Alternatively, you can download the `RouterOS.utm.zip` from GitHub Releases, which will also load automatically.
 
