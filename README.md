@@ -9,7 +9,7 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 >
 > #### To instal UTM virtual machine manager... download from either https://mac.getutm.app/ or [Mac App Store](https://apps.apple.com/us/app/utm-virtual-machines/id1538878817?mt=12).  Once UTM is installed, then use UTM app URL or download the `.zip` from Releases.
 
-
+![Screengrab of UTM with RouterOS](screenshot.png)
 
 ## Install 
 ### _Option One:_ Click "[Install RouterOS via URL](utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip)" to add CHR to UTM
