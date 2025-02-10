@@ -1,4 +1,4 @@
-name: Manual Build and Release
+name: RouterOS for UTM (Intel)
 permissions: write-all
 
 on:
@@ -19,14 +19,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      
       - name: Install packages into building machine
         run: |
           sudo apt-get update
           sudo apt-get install -y unzip qemu-utils rsync gdisk dosfstools parted genisoimage zip
+      
       - name: Set version based on manually triggered build
         id: get-version-custom
         run: |
           echo "ROSVER=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+      
       - name: Print versions for debugging
         run: |
           echo "Build using $ROSVER with ${{ github.event.inputs.script }} script"  
@@ -34,8 +37,12 @@ jobs:
       - name: Run ${{ github.event.inputs.script }} script to download and modify the CHR images
         run: sudo bash ${{ github.event.inputs.script }} $ROSVER
 
+      - name: DEBUG: ls
+        run: ls -Rl
+
       - name: Copy re-packaged CHR to RouterOS.utm/Data
-        run: cp chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.raw RouterOS/Data/chr-uefi-fat.raw
+        run: cp chr-${{ env.ROSVER }}.uefi-fat.raw RouterOS/Data/chr-uefi-fat.raw
+      
       - name: Create artifact using RouterOS.utm directory
         uses: actions/upload-artifact@v4
         with:
