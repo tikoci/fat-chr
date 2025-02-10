@@ -35,7 +35,7 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 
 > [!TIP]
 >
-> For problems, please report on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=204805), or file an [issue](https://github.dev/tikoci/chr-utm/issues) in GitHub.
+> For problems, please report on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=204805), or file an [issue](https://github.com/tikoci/chr-utm/issues) in GitHub.
 >
 >
 
@@ -47,7 +47,7 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 
 * Turns out UTM virtual machines are just ZIP files. So, "build" here is really a `zip` of the CHR image with associated `.plist` (and logo for fun).  
 
-* To work under Apple's Virtualization Framework, the Mikrotik's CHR RAW image must be converted to a  FAT partition to the required EUFI boot.  But this repo re-uses same re-partitioning scripts from [tikoci/fat-chr](https://github.com/tikoci/chr-utm/issues).  And instead of posting the raw image files, the Release is a `.zip` which works with UTM's URL monikers to allow for "Click to Install" 
+* To work under Apple's Virtualization Framework, the Mikrotik's CHR RAW image must be converted to a  FAT partition to the required EUFI boot.  But this repo re-uses same re-partitioning scripts from [tikoci/fat-chr](https://github.com/tikoci/fat-chr).  And instead of posting the raw image files, the Release is a `.zip` which works with UTM's URL monikers to allow for "Click to Install" 
 
 * The URL works because UTM implements Apple URL handlers, so `utm://downloadVM?url=` routes to the UTM app, with a URL to a `.zip` file.   
 ```
