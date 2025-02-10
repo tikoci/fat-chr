@@ -61,10 +61,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: tag v${{ env.ROSVER }}
+          tag_name: v${{ env.ROSVER }}
           release_name: ${{ env.ROSVER }}-${{ github.event.inputs.script }} 
-          body: |
-            UTM packaged fat-chr images.  See https://github.com/tikoci/fat-chr for details on image used.
+          body: "UTM packaged fat-chr images.  See https://github.com/tikoci/fat-chr for details on image used."
           draft: false
           prerelease: true
       - name: Upload CHR RAW image to release
