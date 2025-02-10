@@ -40,98 +40,40 @@ jobs:
       - name: Copy re-packaged CHR to RouterOS.utm/Data
         run: cp chr-${{ env.ROSVER }}.uefi-fat.raw ./RouterOS.utm/Data/chr-uefi-fat.raw
       
+      - name: Create a ZIP file
+        run: zip -r RouterOS.utm.zip RouterOS.utm
+
       - name: Create artifact using RouterOS.utm directory
         uses: actions/upload-artifact@v4
         with:
-          name: RouterOS.utm.zip
+          name: RouterOS.utm
           path: ./RouterOS.utm
-
-# DISABLING CREATING RELEASE
-
-#      - name: Push git tag to save builder's code (required for release)
-#        run: |
-#          git config user.name "GitHub Actions"
-#          git config user.email "github-actions@users.noreply.github.com"
-#          git tag Build${{ github.run_id }}-${{github.event.inputs.script}}
-#          git push origin Build${{ github.run_id }}-${{github.event.inputs.script}}
-#      - name: Create GitHub release
-#        id: create-release
-#        uses: actions/create-release@v1 # comnoco/create-release-action@v2.0.5
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: Build${{ github.run_id }}-${{github.event.inputs.script}} # ${{ github.ref }}
-#          release_name: ${{ env.ROSVER }}-${{ github.event.inputs.script }} 
-#          body: |
-#            UEFI-enabled CHR images, built by GitHub
-#            
-#            `chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.raw` for VirtIO-based hypervisors 
-#            `chr-${{ env.ROSVER }}.uefi-fat-${{ github.event.inputs.script }}.vmdk` for VMWare (with UEFI BIOS in VMX file)
-#            
-#            Optionally, there is a CHR "extra-packages" disk images that can be mounted to more easily add them.
-#            
-#            For debugging, a `partition-debug--${{ env.ROSVER }}.zip` so the disk image can be viewed using Apple's too#ls.
-
-#            *Verison:*  **${{ env.ROSVER }} (${{ github.event.inputs.script }})** [ Build ${{ github.run_id }} ]
-#          draft: false
-#          prerelease: true
-#      - name: Upload CHR RAW image to release
-#        id: upload-release-asset-raw
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create-release.outputs.upload_url }}
-#          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.raw
-#          asset_name: chr-${{  env.ROSVER  }}.uefi-fat-${{ github.event.inputs.script }}.raw
-#          asset_content_type: application/octet-stream
-#      - name: Upload CHR VMDK image to release
-#        id: upload-release-asset-vmdk
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create-release.outputs.upload_url }}
-#          asset_path: ./chr-${{  env.ROSVER  }}.uefi-fat.vmdk
-#          asset_name: chr-${{  env.ROSVER  }}.uefi-fat-${{ github.event.inputs.script }}.vmdk
-#          asset_content_type: application/octet-stream
-#      - name: Upload ZIP for debugging files on each paritition
-#        id: upload-release-asset-partition-debug-zip
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create-release.outputs.upload_url }}
-#          asset_path: ./partition-debug-${{  env.ROSVER  }}.zip
-#          asset_name: partition-debug-${{  env.ROSVER  }}-${{ github.event.inputs.script }}.zip
-#          asset_content_type: application/octet-stream
-#      - name: Upload CHR extra-packages image to release (RAW)
-#        id: upload-release-asset-extra-packages-raw
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create-release.outputs.upload_url }}
-#          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}${{ github.event.inputs.arch }}.img
-#          asset_name: extra-packages-${{  env.ROSVER  }}${{ github.event.inputs.arch }}.img
-#          asset_content_type: application/octet-stream
-#      - name: Upload CHR extra-packages image to release (VMDK)
-#        id: upload-release-asset-extra-packages-vmdk
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create-release.outputs.upload_url }}
-#          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}${{ github.event.inputs.arch }}.vmdk
-#          asset_name: extra-packages-${{  env.ROSVER  }}${{ github.event.inputs.arch }}.vmdk
-#          asset_content_type: application/octet-stream
-#      - name: Upload CHR extra-packages image to release (ISO)
-#        id: upload-release-asset-extra-packages-iso
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create-release.outputs.upload_url }}
-#          asset_path: ./chr-extra-packages-${{  env.ROSVER  }}${{ github.event.inputs.arch }}.iso
-#          asset_name: extra-packages-${{  env.ROSVER  }}${{ github.event.inputs.arch }}.iso
-#          asset_content_type: application/octet-stream
+      - name: Push git tag to save builder's code (required for release)
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag v${{ env.ROSVER }}
+          echo "Build${{ github.run_id }}-${{github.event.inputs.script}}"
+          git push origin v${{ env.ROSVER }}
+      - name: Create GitHub release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: tag v${{ env.ROSVER }}
+          release_name: ${{ env.ROSVER }}-${{ github.event.inputs.script }} 
+          body: |
+            UTM packaged fat-chr images.  See https://github.com/tikoci/fat-chr for details on image used.
+          draft: false
+          prerelease: true
+      - name: Upload CHR RAW image to release
+        id: upload-release-asset-raw
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./RouterOS.utm.zip
+          asset_name: RouterOS.utm.zip
+          asset_content_type: application/octet-stream
