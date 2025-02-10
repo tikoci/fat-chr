@@ -1,28 +1,44 @@
-# fat-chr
+# RouterOS CHR for UTM 
 
-*Builder for a UEFI-enabled RouterOS CHR image using GitHub Action.*
+### Ready-to-use Mikrotik RouterOS CHR for UTM*
+
+If you have an Intel Mac, and UTM is already installed, you can install most release release here automatically.  __* Only Intel-based macOS with UTM installed is supported__, currently no support for Apple Silicon-based macOS.
+
+## Install 
+### Use [Install RouterOS via URL](utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip) to download and install RouterOS automatically
+
+#### Alternatively, you can download the `RouterOS.utm.zip` from GitHub Releases, which will also load automatically.
+
+#### To instal UTM virtual machine manager... download from either https://mac.getutm.app/ or [Mac App Store](https://apps.apple.com/us/app/utm-virtual-machines/id1538878817?mt=12).  Once UTM is installed, then use [Install RouterOS via URL](utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip) or download the `.zip` from Releases.
+
+
+
+
 
 > [!TIP]
-> If these images are required on some virtualized platform/cloud, and Mikrotik's official downloads DO NOT WORK on same platform - please let me know either as [issue](https://github.com/tikoci/fat-chr/issues) here or on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=184254) – as I've been collecting data.  The current summary is:
-> * **Apple Virtualization Framework**  On Intel, all images should work.  On ARM-based M1/M2/M3, **none** have been reported to work.  
-> * **Vultr** - Mikrotik images only work because the [instructions suggest SystemRescueCD and `dd`](https://help.mikrotik.com/docs/display/ROS/CHR+Vultr+installation), reported that the "@jaclaz method" (used in all post-7.15 [releases](https://github.com/tikoci/fat-chr/releases) work _without_  Mikrotik's "`dd` approach", see [this post](https://forum.mikrotik.com/viewtopic.php?t=184254&hilit=EUFI#p1100169)
-> * **Oracle Cloud using ARM64/Amprere**  Reported that _experimental_ ARM64 7.17beta2 image worked (all other packages are Intel-only).  See @BetaQuasi comment in https://github.com/tikoci/fat-chr/issues/5#issuecomment-2394976574
+>
+> For problems, please report on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=184254), or file an [issue](https://github.dev/tikoci/chr-utm/issues) in GitHub.
+>
+>
 
 
-## Use Case
-Mikrotik's virtual machine version of RouterOS ("CHR") is downloadable as a RAW image.  However, this image is incompatible with UEFI-based bootloaders.  Specifically, Apple's Virtualization Framework for [Intel-based MacOS to run RouterOS CHR](https://forum.mikrotik.com/viewtopic.php?t%253D204805#p1057569)
+## About UTM and RouterOS
+[UTM](https://mac.getutm.app/) is open source virtual machine host for Apple macOS, which avaialble for download, or via Mac App Store.  CHR is a Mikrotik RouterOS disk image for virtual machines, which is full operational, but bandwidth limited.  See [Mikrotik's CHR](https://help.mikrotik.com/docs/spaces/ROS/pages/18350234/Cloud+Hosted+Router+CHR#CloudHostedRouter,CHR-CHRLicensing) page for details on RouterOS limits and licensing details.  
 
-## Implementation Notes
-Non-EUFI raw images for "stable" and "testing" for latest version are downloaded.  CI will convert the partitioning scheme from EXT2 to FAT16 using `gdisk` & publish as a release.
-* **CI builder** https://github.com/tikoci/fat-chr/blob/main/.github/workflows/build.yaml
-* **Raw Image Converter Script** https://github.com/tikoci/fat-chr/blob/main/build.bash
+> While, RouterOS images for ARM _should_ work with UTM on ARM-based macOS, using QEMU mode.  Feel free to make a pull request, or issue with `.plist` and other details for ARM support.
 
-There is "workflow_dispatch" on the "Build and Release" to manual trigger a specific build to fetch older/specific versions & select a script to run.  All builds marked as "pre-release" in Releases and must be manually changed to remove the flag. No check is done if a version was already build, so duplicates can be deleted manually.  
 
-## Variants and Credits 
-* [@kriszos's posting](https://forum.mikrotik.com/viewtopic.php?p=1025068&hilit=UEFI#p933799) on the Mikrotik forum "QG" bash script to convert the CHR raw image from EXT2 to FAT16 script, and do some modifications of the partition tables.  All images prior to 7.15, are built using this script.  CHR Version 7.15 introduced overlapping partitions, so @kriszos's script no longer worked.  
-* [@jaclaz's hybrid diatribes](https://forum.mikrotik.com/viewtopic.php?p=1100753&hilit=uefi#p1098260) create a newer version that processed the overlap in `gdisk`.  This script is used in CHR 7.15 and above images.
-* [@Amm0]() added the "no-gdisk variant script, which does not change the partition table, instead it only does a conversion from `ext2` to `fat` of the EFI partition.  One use case for the CHR images here is Apple Virtualization support, which just need EFI partition to be `fat` (_i.e._ MacOS has no support for mounting ext2, and per UEFI specs it should be `fat`).  
+## Technical Notes
 
-## Use at your own risk...
-[See GitHub statement on open source](https://opensource.guide/notices/)
+* The package here use "Apple Virtualization" mode in UTM, as more direct path to OS services than QEMU.
+
+
+* Turns out UTM virtual machines are just ZIP files. So, "build" here is really a `zip` of the CHR image with associated `.plist` (and logo for fun).  
+
+* To work under Apple's Virtualization Framework, the Mikrotik's CHR RAW image must be converted to a  FAT partition to the required EUFI boot.  But this repo re-uses same re-partitioning scripts from [tikoci/fat-chr](https://github.dev/tikoci/chr-utm/issues).  And instead of posting the raw image files, the Release is a `.zip` which works with UTM's URL monikers to allow for "Click to Install" 
+
+* The URL works because UTM implements Apple URL handlers, so `utm://downloadVM?url=` routes to the UTM app, with a URL to a `.zip` file.   
+```
+utm://downloadVM?url=https://example.com/.../vm.utm.zip
+```
+And, that's how the "Install via URL" works.
