@@ -1,8 +1,15 @@
 # RouterOS CHR for UTM 
 
-### Ready-to-use Mikrotik RouterOS CHR for UTM*
+### Ready-to-use [Mikrotik RouterOS](https://mikrotik.com/software) CHR for UTM*
 
 If you have an Intel Mac, and UTM is already installed, you can install most release release here automatically.  __* Only Intel-based macOS with UTM installed is supported__, currently no support for Apple Silicon-based macOS.
+
+
+> [!NOTE]
+>
+> #### To instal UTM virtual machine manager... download from either https://mac.getutm.app/ or [Mac App Store](https://apps.apple.com/us/app/utm-virtual-machines/id1538878817?mt=12).  Once UTM is installed, then use UTM app URL or download the `.zip` from Releases.
+
+
 
 ## Install 
 ### _Option One:_ Click "[Install RouterOS via URL](utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip)" to add CHR to UTM
@@ -15,11 +22,6 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 ```
 
 ### _Option Two:_  Download the [`RouterOS.utm.zip`](https://github.com/tikoci/chr-utm/releases/download/v7.17.2/RouterOS.utm.zip) from GitHub Releases, which expands into a runnable UTM virtual machine for CHR 
-
-
-> [!NOTE]
->
-> #### To instal UTM virtual machine manager... download from either https://mac.getutm.app/ or [Mac App Store](https://apps.apple.com/us/app/utm-virtual-machines/id1538878817?mt=12).  Once UTM is installed, then use [Install RouterOS via URL](utm://downloadVM?url=https://github.com/tikoci/chr-utm/releases/latest/RouterOS.utm.zip) or download the `.zip` from Releases.
 
 
 
@@ -52,3 +54,6 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 utm://downloadVM?url=https://example.com/.../vm.utm.zip
 ```
 And, that's how the "Install via URL" works.
+
+* But... app URL may require a .well-known file per Apple schemes to work from GitHub (thus note about using Safari above)
+
