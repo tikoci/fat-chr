@@ -25,19 +25,19 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 
 
 
-
-
-> [!TIP]
->
-> For problems, please report on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=184254), or file an [issue](https://github.dev/tikoci/chr-utm/issues) in GitHub.
->
->
-
-
 ## About UTM and RouterOS
 [UTM](https://mac.getutm.app/) is open source virtual machine host for Apple macOS, which avaialble for download, or via Mac App Store.  CHR is a Mikrotik RouterOS disk image for virtual machines, which is full operational, but bandwidth limited.  See [Mikrotik's CHR](https://help.mikrotik.com/docs/spaces/ROS/pages/18350234/Cloud+Hosted+Router+CHR#CloudHostedRouter,CHR-CHRLicensing) page for details on RouterOS limits and licensing details.  
 
 > While, RouterOS images for ARM _should_ work with UTM on ARM-based macOS, using QEMU mode.  Feel free to make a pull request, or issue with `.plist` and other details for ARM support.
+
+
+
+
+> [!TIP]
+>
+> For problems, please report on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=204805), or file an [issue](https://github.dev/tikoci/chr-utm/issues) in GitHub.
+>
+>
 
 
 ## Technical Notes
@@ -47,7 +47,7 @@ If you have an Intel Mac, and UTM is already installed, you can install most rel
 
 * Turns out UTM virtual machines are just ZIP files. So, "build" here is really a `zip` of the CHR image with associated `.plist` (and logo for fun).  
 
-* To work under Apple's Virtualization Framework, the Mikrotik's CHR RAW image must be converted to a  FAT partition to the required EUFI boot.  But this repo re-uses same re-partitioning scripts from [tikoci/fat-chr](https://github.dev/tikoci/chr-utm/issues).  And instead of posting the raw image files, the Release is a `.zip` which works with UTM's URL monikers to allow for "Click to Install" 
+* To work under Apple's Virtualization Framework, the Mikrotik's CHR RAW image must be converted to a  FAT partition to the required EUFI boot.  But this repo re-uses same re-partitioning scripts from [tikoci/fat-chr](https://github.com/tikoci/chr-utm/issues).  And instead of posting the raw image files, the Release is a `.zip` which works with UTM's URL monikers to allow for "Click to Install" 
 
 * The URL works because UTM implements Apple URL handlers, so `utm://downloadVM?url=` routes to the UTM app, with a URL to a `.zip` file.   
 ```
