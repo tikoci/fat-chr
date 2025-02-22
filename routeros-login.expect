@@ -1,0 +1,59 @@
+#!/usr/bin/expect -f
+
+# Configuration - change as needed
+set serial_port "/dev/ttys009"
+set username "admin"
+set new_password "yournewpassword"
+
+# RouterOS default to 115200, so likely do not change
+set baud_rate "115200"
+
+# Start the serial session with 'screen'
+spawn screen $serial_port $baud_rate
+
+# Or, for larger expect scripts you may want to use `cu` and expect eof
+#spawn cu -l $serial_port -s $baud_rate
+
+# Ensure we start clean by sending multiple Enter keys
+
+sleep 1
+
+# Login loop: Ensure we reach the MikroTik CLI prompt
+while {1} {
+    expect {
+        "MikroTik Login: " {
+            send "$username\r"
+            exp_continue
+        }
+        "Password: " {
+            send "\r"  ;# Default MikroTik admin user has no password on first login
+            exp_continue
+        }
+        -re {Do you want to see the software license} {
+            send "n\r"
+            exp_continue
+        }
+        "new password> " {
+            send "\x03"
+            exp_continue
+        }
+        "repeat new password> " {
+            send "\x03"
+            exp_continue
+        }
+        -re {\[.*@.*\] >} {
+            send "/ip/address/print\r"
+            break
+        }
+        timeout {
+            send "\r"
+            exp_continue
+        }
+    }
+}
+
+# Hand over control to the user
+interact
+
+# For HEREDOC only, use
+#expect eof
