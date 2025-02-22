@@ -34,7 +34,9 @@ The same image can install multiple times, using a couple of steps:
 ### Networking Options
 In UTM virtual machine settings for CHR, you have a few networking options. Two imporant things to know:
 1. You can add more than one interface in UTM, but the is only one "Shared" network - which is a UTM-specific subnet, that is then NAT'ed out a "real" macOS interface.  And you should be able to use any many networks adapters with the "Shared" type, they still all be on the same subnet – may not be as useful for testing.
-2. UTM also supports a "Bridge (advanced)" mode, and you can select either default first interface as that.  Or, add a new interface that uses Bridge mode, leaving the first for "Shared" as kinda management port.  
+2. UTM also supports a "Bridged (advanced)" mode, and you can select either default first interface as that.  Or, add a new interface that uses Bridge mode, leaving the first for "Shared" as kinda management port.  With Bridge mode, CHR will act more like a router - in that at least it's own MAC address is on same LAN as macOS _as an independant_ device.
+3. You can also add USB dongles or other network interface, and wire them up as a "Bridged (advanced)" Network interface in RouterOS UTM settings. This could, theoricially, connect CHR to some WAN or other network outside of macOS.
+4. To isolate a UTM "Bridged" network from macOS usage, you can go to "Network" in System Preferences, and set IPv4 to "No" and set IPv6 to "Manual" on a UTM bridged interface to remove macOS for that bridged adapter.  
 
 ### No Display Support
 The RouterOS image is configured to use UTM's serial terminal, by default.  This is for a couple reasons:
