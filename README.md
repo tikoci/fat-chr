@@ -32,7 +32,7 @@ The same image can install multiple times, using a couple of steps:
 2. By default, the CHR is named "RouterOS", since this also the "file" name.  You should rename any existing image from "RouterOS" to something like "CHR1" or whatever you like as long all CHR have a unique name in UTM.
 
 ### Networking Options
-In UTM virtual machine settings for CHR, you have a few networking options. Two imporant things to know:
+In UTM virtual machine settings for CHR, you have a few networking options. A few imporant things to know:
 1. You can add more than one interface in UTM, but the is only one "Shared" network - which is a UTM-specific subnet, that is then NAT'ed out a "real" macOS interface.  And you should be able to use any many networks adapters with the "Shared" type, they still all be on the same subnet – may not be as useful for testing.
 2. UTM also supports a "Bridged (advanced)" mode, and you can select either default first interface as that.  Or, add a new interface that uses Bridge mode, leaving the first for "Shared" as kinda management port.  With Bridge mode, CHR will act more like a router - in that at least it's own MAC address is on same LAN as macOS _as an independant_ device.
 3. You can also add USB dongles or other network interface, and wire them up as a "Bridged (advanced)" Network interface in RouterOS UTM settings. This could, theoricially, connect CHR to some WAN or other network outside of macOS.
