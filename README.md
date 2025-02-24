@@ -75,7 +75,7 @@ end tell
 
 
 ### "Free" CHR is limited to 1Mb/s
-The image here has no license, so it runs in "free" mode.  The limits speed to  There is a "trial" mode that is also free, but you need to register at www.mikrotik.com to get a CHR trial license.  Mikrotik's [CHR documentation](https://help.mikrotik.com/docs/spaces/ROS/pages/18350234/Cloud+Hosted+Router+CHR#CloudHostedRouter%2CCHR-Freelicenses) describes fully but to summarize:
+The image here has no license, so it runs in "free" mode.  This limits speed to  There is a "trial" mode that is also free, but you need to register at www.mikrotik.com to get a CHR trial license.  Mikrotik's [CHR documentation](https://help.mikrotik.com/docs/spaces/ROS/pages/18350234/Cloud+Hosted+Router+CHR#CloudHostedRouter%2CCHR-Freelicenses) describes fully but to summarize:
 
 > **Free**
 > The free license level allows CHR to run indefinitely. It is limited to 1Mbps upload per interface. All the rest of the features provided by CHR are available without restrictions.
@@ -106,3 +106,22 @@ The image here has no license, so it runs in "free" mode.  The limits speed to  
 > For problems, please report on [Mikrotik's forum](https://forum.mikrotik.com/viewtopic.php?t=204805), or file an [issue](https://github.com/tikoci/chr-utm/issues) in GitHub.
 >
 >
+
+
+## Technical Notes
+
+* The package here use "Apple Virtualization" mode in UTM, as more direct path to OS services than QEMU.
+
+
+* Turns out UTM virtual machines are just ZIP files. So, "build" here is really a `zip` of the CHR image with associated `.plist` (and logo for fun).  
+
+* To work under Apple's Virtualization Framework, the Mikrotik's CHR RAW image must be converted to a  FAT partition to the required EUFI boot.  But this repo re-uses same re-partitioning scripts from [tikoci/fat-chr](https://github.com/tikoci/fat-chr).  And instead of posting the raw image files, the Release is a `.zip` which works with UTM's URL monikers to allow for "Click to Install" 
+
+* The URL works because UTM implements Apple URL handlers, so `utm://downloadVM?url=` routes to the UTM app, with a URL to a `.zip` file.   
+```
+utm://downloadVM?url=https://example.com/.../vm.utm.zip
+```
+And, that's how the "Install via URL" works.
+
+* But... app URL may require a .well-known file per Apple schemes to work from GitHub (thus note about using Safari above)
+
