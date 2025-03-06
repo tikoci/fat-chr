@@ -40,10 +40,10 @@ jobs:
             var versions = []
             console.log(steps)
             if (!steps.has-stable.outputs.release-exists) {
-              versions += context.steps["get-stable"].version
+              versions += steps.get-stable.outputs.version
             }
             if (!steps.has-testing.outputs.release-exists) {
-              versions += context.steps["get-testing"].version
+              versions += steps.get-testing.outputs.version
             }
             console.log(versions)
             return versions
