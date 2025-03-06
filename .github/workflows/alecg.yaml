@@ -7,16 +7,6 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        channel:
-          - stable
-          - testing
-
-
   build:
     permissions:
       contents: write
@@ -76,6 +66,7 @@ jobs:
             }
 
       - name: Load nbd module
+        if: ${{ steps.check-release.outputs.ReleaseExists == 'false'}}
         run: |
           sudo -E modprobe nbd
 
