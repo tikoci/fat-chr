@@ -14,9 +14,7 @@ jobs:
     name: Build Image
 
     runs-on: ubuntu-latest
-
-    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
-    
+        
     strategy:
       matrix:
         channel:
