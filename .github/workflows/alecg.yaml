@@ -7,19 +7,60 @@ permissions:
   contents: read
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    name: Check New Version
+    outputs:
+      versions: ${{ steps.needs-versions.outputs.versions }}
+    steps:
+      - name: Get RouterOS "stable" version
+        id: get-stable
+        run: |
+          ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.stable | awk 'FS=" " {print $1}'`
+          echo version=$ROSVER >> $GITHUB_OUTPUT
+      - name: Get RouterOS "stable" version
+        id: get-testing
+        run: |
+          ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.testing | awk 'FS=" " {print $1}'`
+          echo version=$ROSVER >> $GITHUB_OUTPUT    
+      - name: Check "stable" channel is release
+        id: has-stable
+        uses: f2calv/gha-check-release-exists@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ReleaseName: ${{ steps.get-stable.outputs.version }}
+      - name: Check "testing" channel is release
+        id: has-testing
+        uses: f2calv/gha-check-release-exists@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ReleaseName: ${{ steps.get-testing.outputs.version }}
+      - name: Build Versions for Build "Matrix"
+        id: needs-versions
+        uses: actions/github-script@v6
+        with:
+          script: |
+            var versions = []
+            if (!context.steps.has-stable.outputs.ReleaseExists) {
+              versions += context.steps.get-stable.version
+            }
+            if (!context.steps.has-testing.outputs.ReleaseExists) {
+              versions += context.steps.get-testing.version
+            }
+            console.log(versions)
+            return versions
   build:
+    needs: check
     permissions:
       contents: write
 
     name: Build Image
 
     runs-on: ubuntu-latest
-        
+
     strategy:
       matrix:
-        channel:
-          - stable
-          - testing
+        version: ${{ fromJSON(needs.check.outputs.versions) }}
 
     steps:
       - name: Checkout
@@ -32,45 +73,13 @@ jobs:
           sudo -E apt update
           sudo -E apt -y install curl qemu-utils rsync unzip zip
 
-
-      - name: Get RouterOS version from Channel
-        id: find-version
-        run: |
-          ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.${{matrix.channel}} | awk 'FS=" " {print $1}'`
-          echo version=$ROSVER >> $GITHUB_OUTPUT
-  
-      - name: Check if Release Exists
-        id: check-release
-        uses: f2calv/gha-check-release-exists@v2
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ReleaseName: ${{ steps.find-version.outputs.version }}
-
-      - uses: actions/github-script@v6
-        if: ${{ steps.check-release.outputs.ReleaseExists == 'true'}}
-        with:
-          script: |
-            const delay = ms => new Promise(res => setTimeout(res, ms));
-            
-            github.rest.actions.cancelWorkflowRun({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            });
-              
-            while (true) {
-              core.info('Waiting for workflow to cancel ...');
-              await delay(5000);
-            }
-
       - name: Load nbd module
-        if: ${{ steps.check-release.outputs.ReleaseExists == 'false'}}
         run: |
           sudo -E modprobe nbd
 
       - name: Download
         run: |
-          curl -skL --retry 3 --connect-timeout 3 -o chr.img.zip https://download.mikrotik.com/routeros/${{steps.find-version.outputs.version}}/chr-${{steps.find-version.outputs.version}}.img.zip
+          curl -skL --retry 3 --connect-timeout 3 -o chr.img.zip https://download.mikrotik.com/routeros/${{matrix.version}}/chr-${{matrix.version}}.img.zip
           unzip chr.*.zip
           rm -rf chr.*.zip
 
@@ -136,21 +145,21 @@ jobs:
       - name: Zip images
         run: |
           cd ./Firmware/
-          zip chr-${{steps.find-version.outputs.version}}.qcow2.zip chr-efi.qcow2
-          zip chr-${{steps.find-version.outputs.version}}.vmdk.zip chr-efi.vmdk
-          zip chr-${{steps.find-version.outputs.version}}.vhd.zip chr-efi.vhd
-          zip chr-${{steps.find-version.outputs.version}}.vhdx.zip chr-efi.vhdx
-          zip chr-${{steps.find-version.outputs.version}}.vdi.zip chr-efi.vdi
-          zip chr-${{steps.find-version.outputs.version}}.img.zip chr-efi.img
+          zip chr-${{matrix.version}}.qcow2.zip chr-efi.qcow2
+          zip chr-${{matrix.version}}.vmdk.zip chr-efi.vmdk
+          zip chr-${{matrix.version}}.vhd.zip chr-efi.vhd
+          zip chr-${{matrix.version}}.vhdx.zip chr-efi.vhdx
+          zip chr-${{matrix.version}}.vdi.zip chr-efi.vdi
+          zip chr-${{matrix.version}}.img.zip chr-efi.img
           ls -l ./
 
       - name: Upload Firmware to release
         uses: ncipollo/release-action@v1
         with:
-          name: ${{steps.find-version.outputs.version}}
+          name: ${{matrix.version}}
           allowUpdates: true
           removeArtifacts: true
-          tag: ${{steps.find-version.outputs.version}}
+          tag: ${{matrix.version}}
           commit: master
           token:  ${{ secrets.GITHUB_TOKEN }}
           artifacts: ./Firmware/*.zip
