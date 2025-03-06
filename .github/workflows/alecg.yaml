@@ -26,13 +26,11 @@ jobs:
         id: has-stable
         uses: insightsengineering/release-existence-action@v1.0.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ steps.get-stable.outputs.version }}
       - name: Check "testing" channel is release
         id: has-testing
         uses: insightsengineering/release-existence-action@v1.0.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ steps.get-testing.outputs.version }}
       - name: Build Versions for Build "Matrix"
         id: needs-versions
@@ -40,11 +38,12 @@ jobs:
         with:
           script: |
             var versions = []
-            if (!context.steps.has-stable.outputs.release-exists) {
-              versions += context.steps.get-stable.version
+            console.log(context)
+            if (!context.steps["has-stable"].outputs["release-exists"]) {
+              versions += context.steps["get-stable"].version
             }
-            if (!context.steps.has-testing.outputs.release-exists) {
-              versions += context.steps.get-testing.version
+            if (!context.steps["has-testing"].outputs["release-exists"]) {
+              versions += context.steps["get-testing"].version
             }
             console.log(versions)
             return versions
