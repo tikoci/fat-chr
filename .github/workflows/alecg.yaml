@@ -160,6 +160,6 @@ jobs:
           allowUpdates: true
           removeArtifacts: true
           tag: ${{matrix.version}}
-          commit: master
+          commit: main
           token:  ${{ secrets.GITHUB_TOKEN }}
           artifacts: ./Firmware/*.zip
