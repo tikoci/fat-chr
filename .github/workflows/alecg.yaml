@@ -38,11 +38,11 @@ jobs:
         with:
           script: |
             var versions = []
-            console.log(context)
-            if (!context.steps["has-stable"].outputs["release-exists"]) {
+            console.log(steps)
+            if (!steps.has-stable.outputs.release-exists) {
               versions += context.steps["get-stable"].version
             }
-            if (!context.steps["has-testing"].outputs["release-exists"]) {
+            if (!steps.has-testing.outputs.release-exists) {
               versions += context.steps["get-testing"].version
             }
             console.log(versions)
