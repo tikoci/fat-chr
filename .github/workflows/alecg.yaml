@@ -38,14 +38,15 @@ jobs:
         id: needs-versions
         uses: actions/github-script@v6
         with:
+          result-encoding: json
           script: |
             var versions = []
             console.log(context.steps)
             if (!${{ steps.has-stable.outputs.release-exists }}) {
-              versions += "${{ steps.get-stable.outputs.version }}"
+              versions.push("${{ steps.get-stable.outputs.version }}")
             }
             if (!${{ steps.has-stable.outputs.release-exists }}) {
-              versions += "${{ steps.get-testing.outputs.version }}"
+              versions.push("${{ steps.get-testing.outputs.version }}")
             }
             console.log(versions)
             return versions
