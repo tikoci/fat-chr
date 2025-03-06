@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Check New Version
     outputs:
-      versions: ${{ steps.needs-versions.outputs.versions }}
+      versions: ${{ steps.needs-versions.outputs.result }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +41,6 @@ jobs:
           result-encoding: json
           script: |
             var versions = []
-            console.log(context.steps)
             if (!${{ steps.has-stable.outputs.release-exists }}) {
               versions.push("${{ steps.get-stable.outputs.version }}")
             }
