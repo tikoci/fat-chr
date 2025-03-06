@@ -12,6 +12,8 @@ jobs:
     outputs:
       versions: ${{ steps.needs-versions.outputs.versions }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Get RouterOS "stable" version
         id: get-stable
         run: |
