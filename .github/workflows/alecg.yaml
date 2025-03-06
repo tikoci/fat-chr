@@ -1,0 +1,167 @@
+name: Streamlined Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        channel:
+          - stable
+          - testing
+
+
+  build:
+    permissions:
+      contents: write
+
+    name: Build Image
+
+    runs-on: ubuntu-latest
+
+    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
+    
+    strategy:
+      matrix:
+        channel:
+          - stable
+          - testing
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt update
+          sudo -E apt -y install curl qemu-utils rsync unzip zip
+
+
+      - name: Get RouterOS version from Channel
+        id: find-version
+        run: |
+          ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.${{matrix.channel}} | awk 'FS=" " {print $1}'`
+          echo version=$ROSVER >> $GITHUB_OUTPUT
+  
+      - name: Check if Release Exists
+        id: check-release
+        uses: f2calv/gha-check-release-exists@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ReleaseName: ${{ steps.find-version.outputs.version }}
+
+      - uses: actions/github-script@v6
+        if: ${{ steps.check-release.outputs.ReleaseExists == 'true'}}
+        with:
+          script: |
+            const delay = ms => new Promise(res => setTimeout(res, ms));
+            
+            github.rest.actions.cancelWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+              
+            while (true) {
+              core.info('Waiting for workflow to cancel ...');
+              await delay(5000);
+            }
+
+      - name: Load nbd module
+        run: |
+          sudo -E modprobe nbd
+
+      - name: Download
+        run: |
+          curl -skL --retry 3 --connect-timeout 3 -o chr.img.zip https://download.mikrotik.com/routeros/${{steps.find-version.outputs.version}}/chr-${{steps.find-version.outputs.version}}.img.zip
+          unzip chr.*.zip
+          rm -rf chr.*.zip
+
+      - name: Convert to qcow2
+        run: |
+          qemu-img convert -f raw -O qcow2 chr-*.img chr.qcow2
+          cp -af chr.qcow2 chr-efi.qcow2
+          rm -rf chr-*.img
+
+      - name: Connect ndb
+        run: |
+          sudo -E qemu-nbd -c /dev/nbd0 chr.qcow2
+          sudo -E qemu-nbd -c /dev/nbd1 chr-efi.qcow2
+
+      - name: Format boot partition
+        run: |
+          sudo -E mkfs -t fat /dev/nbd1p1
+
+      - name: Create tmp dir
+        run: |
+          sudo -E rm -rf /tmp/chr*
+          sudo -E mkdir /tmp/chr-bios/
+          sudo -E mkdir /tmp/chr-efi/
+
+      - name: Mount
+        run: |
+          sudo -E mount /dev/nbd0p1 /tmp/chr-bios/
+          sudo -E mount /dev/nbd1p1 /tmp/chr-efi/
+
+      - name: Sync files
+        run: |
+          sudo -E rsync -a /tmp/chr-bios/ /tmp/chr-efi/
+
+      - name: Umount
+        run: |
+          sudo -E umount /dev/nbd0p1
+          sudo -E umount /dev/nbd1p1
+
+      - name: remove tmp dir
+        run: |
+          sudo -E rm -rf /tmp/chr*
+
+      - name: Disconnect ndb
+        run: |
+          sudo -E qemu-nbd -d /dev/nbd0
+          sudo -E qemu-nbd -d /dev/nbd1
+
+      - name: Remove old
+        run: |
+          rm -rf chr.qcow2
+
+      - name: Convert images
+        run: |
+          mkdir -p ./Firmware/
+          cp -f chr-efi.qcow2 ./Firmware/
+          qemu-img convert -f qcow2 -O vmdk chr-efi.qcow2 ./Firmware/chr-efi.vmdk
+          qemu-img convert -f qcow2 -O vpc chr-efi.qcow2 ./Firmware/chr-efi.vhd
+          qemu-img convert -f qcow2 -O vhdx chr-efi.qcow2 ./Firmware/chr-efi.vhdx
+          qemu-img convert -f qcow2 -O vdi chr-efi.qcow2 ./Firmware/chr-efi.vdi
+          qemu-img convert -f qcow2 -O raw chr-efi.qcow2 ./Firmware/chr-efi.img
+          ls -l ./Firmware
+
+      - name: Zip images
+        run: |
+          cd ./Firmware/
+          zip chr-${{steps.find-version.outputs.version}}.qcow2.zip chr-efi.qcow2
+          zip chr-${{steps.find-version.outputs.version}}.vmdk.zip chr-efi.vmdk
+          zip chr-${{steps.find-version.outputs.version}}.vhd.zip chr-efi.vhd
+          zip chr-${{steps.find-version.outputs.version}}.vhdx.zip chr-efi.vhdx
+          zip chr-${{steps.find-version.outputs.version}}.vdi.zip chr-efi.vdi
+          zip chr-${{steps.find-version.outputs.version}}.img.zip chr-efi.img
+          ls -l ./
+
+      - name: Upload Firmware to release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{steps.find-version.outputs.version}}
+          allowUpdates: true
+          removeArtifacts: true
+          tag: ${{steps.find-version.outputs.version}}
+          commit: master
+          token:  ${{ secrets.GITHUB_TOKEN }}
+          artifacts: ./Firmware/*.zip
