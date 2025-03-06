@@ -2,6 +2,8 @@ name: Streamlined Build
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
 
 permissions: write-all
 
@@ -59,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     
     if: ${{ fromJSON(needs.check.outputs.versions).length > 0 }}
-    
+
     strategy:
       matrix:
         version: ${{ fromJSON(needs.check.outputs.versions) }}
