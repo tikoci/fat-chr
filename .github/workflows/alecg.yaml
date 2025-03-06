@@ -3,8 +3,7 @@ name: Streamlined Build
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: write-all
 
 jobs:
   check:
@@ -25,26 +24,26 @@ jobs:
           echo version=$ROSVER >> $GITHUB_OUTPUT    
       - name: Check "stable" channel is release
         id: has-stable
-        uses: f2calv/gha-check-release-exists@v2
+        uses: insightsengineering/release-existence-action@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ReleaseName: ${{ steps.get-stable.outputs.version }}
+          release-tag: ${{ steps.get-stable.outputs.version }}
       - name: Check "testing" channel is release
         id: has-testing
-        uses: f2calv/gha-check-release-exists@v2
+        uses: insightsengineering/release-existence-action@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ReleaseName: ${{ steps.get-testing.outputs.version }}
+          release-tag: ${{ steps.get-testing.outputs.version }}
       - name: Build Versions for Build "Matrix"
         id: needs-versions
         uses: actions/github-script@v6
         with:
           script: |
             var versions = []
-            if (!context.steps.has-stable.outputs.ReleaseExists) {
+            if (!context.steps.has-stable.outputs.release-exists) {
               versions += context.steps.get-stable.version
             }
-            if (!context.steps.has-testing.outputs.ReleaseExists) {
+            if (!context.steps.has-testing.outputs.release-exists) {
               versions += context.steps.get-testing.version
             }
             console.log(versions)
