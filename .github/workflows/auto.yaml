@@ -54,9 +54,9 @@ jobs:
             console.log(versions)
             return versions
       - run: |
-          echo '${{ fromJSON(steps.needs-versions.outputs.result) }}'
+          echo '${{ steps.needs-versions.outputs.result }}'
       - run:  
-          echo '${{ fromJSON(steps.needs-versions.outputs.result).length > 0 }}'
+          echo '${{ steps.needs-versions.outputs.result.length > 0 }}'
   build:
     needs: check
     permissions:
