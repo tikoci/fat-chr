@@ -56,7 +56,7 @@ jobs:
       - run: |
           echo '${{ steps.needs-versions.outputs.result }}'
       - run:  
-          echo '${{ steps.needs-versions.outputs.result.length > 0 }}'
+          echo '${{ fromJSON(steps.needs-versions.outputs.result)[0] }}'
   build:
     needs: check
     permissions:
