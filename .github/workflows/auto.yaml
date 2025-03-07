@@ -46,17 +46,17 @@ jobs:
           script: |
             var versions = []
             if (!${{ steps.has-stable.outputs.release-exists }}) {
-              versions.push(${{ steps.get-stable.outputs.version }})
+              versions.push("${{ steps.get-stable.outputs.version }}")
             }
             if (!${{ steps.has-testing.outputs.release-exists }}) {
-              versions.push(${{ steps.get-testing.outputs.version }})
+              versions.push("${{ steps.get-testing.outputs.version }}")
             }
             console.log(versions)
             return versions
       - run: |
-          echo ${{ fromJSON(steps.needs-versions.outputs.results) }}
+          echo '${{ fromJSON(steps.needs-versions.outputs.result) }}'
       - run:  
-          echo ${{ fromJSON(steps.needs-versions.outputs.results).length > 0 }}
+          echo '${{ fromJSON(steps.needs-versions.outputs.result).length > 0 }}'
   build:
     needs: check
     permissions:
