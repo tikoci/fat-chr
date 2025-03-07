@@ -53,10 +53,10 @@ jobs:
             }
             console.log(versions)
             return versions
-      - run: |
+      - name: Log Results
+        run: |
           echo '${{ steps.needs-versions.outputs.result }}'
-      - run:  
-          echo '${{ fromJSON(steps.needs-versions.outputs.result).length }}'
+          echo '${{ fromJSON(steps.needs-versions.outputs.result)[0] != null }}'
   build:
     needs: check
     permissions:
@@ -66,7 +66,7 @@ jobs:
 
     runs-on: ubuntu-latest
     
-    if: ${{ fromJSON(needs.check.outputs.versions).length > 0 }}
+    if: ${{ fromJSON(needs.check.outputs.versions)[0] != null }}
 
     strategy:
       matrix:
