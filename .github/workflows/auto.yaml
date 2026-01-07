@@ -28,6 +28,12 @@ jobs:
           ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.testing | awk 'FS=" " {print $1}'`
           echo version=$ROSVER >> $GITHUB_OUTPUT    
           echo $ROSVER
+      - name: Get RouterOS "development" version
+        id: get-dev
+        run: |
+          ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.development | awk 'FS=" " {print $1}'`
+          echo version=$ROSVER >> $GITHUB_OUTPUT
+          echo $ROSVER
       - name: Check "stable" channel is release
         id: has-stable
         uses: insightsengineering/release-existence-action@v1.0.0
@@ -38,6 +44,11 @@ jobs:
         uses: insightsengineering/release-existence-action@v1.0.0
         with:
           release-tag: ${{ steps.get-testing.outputs.version }}
+      - name: Check "development" channel is release
+        id: has-dev
+        uses: insightsengineering/release-existence-action@v1.0.0
+        with:
+          release-tag: ${{ steps.get-dev.outputs.version }}
       - name: Build Versions for Build "Matrix"
         id: needs-versions
         uses: actions/github-script@v6
@@ -50,6 +61,9 @@ jobs:
             }
             if (!${{ steps.has-testing.outputs.release-exists }}) {
               versions.push("${{ steps.get-testing.outputs.version }}")
+            }
+            if (!${{ steps.has-dev.outputs.release-exists }}) {
+              versions.push("${{ steps.get-dev.outputs.version }}")
             }
             console.log(versions)
             return versions
