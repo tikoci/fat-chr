@@ -59,7 +59,7 @@ jobs:
         id: has-longterm
         uses: insightsengineering/release-existence-action@v1.0.0
         with:
-          release-tag: ${{ steps.get-dev.outputs.version }}
+          release-tag: ${{ steps.get-longterm.outputs.version }}
       - name: Build Versions for Build "Matrix"
         id: needs-versions
         uses: actions/github-script@v6
