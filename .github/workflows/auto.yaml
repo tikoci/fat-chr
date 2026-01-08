@@ -34,6 +34,12 @@ jobs:
           ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.development | awk 'FS=" " {print $1}'`
           echo version=$ROSVER >> $GITHUB_OUTPUT
           echo $ROSVER
+      - name: Get RouterOS "long-term" version
+        id: get-longterm
+        run: |
+          ROSVER=`curl -s https://upgrade.mikrotik.com/routeros/NEWESTa7.long-term | awk 'FS=" " {print $1}'`
+          echo version=$ROSVER >> $GITHUB_OUTPUT
+          echo $ROSVER
       - name: Check "stable" channel is release
         id: has-stable
         uses: insightsengineering/release-existence-action@v1.0.0
@@ -46,6 +52,11 @@ jobs:
           release-tag: ${{ steps.get-testing.outputs.version }}
       - name: Check "development" channel is release
         id: has-dev
+        uses: insightsengineering/release-existence-action@v1.0.0
+        with:
+          release-tag: ${{ steps.get-dev.outputs.version }}
+      - name: Check "long-term" channel is release
+        id: has-longterm
         uses: insightsengineering/release-existence-action@v1.0.0
         with:
           release-tag: ${{ steps.get-dev.outputs.version }}
@@ -64,6 +75,9 @@ jobs:
             }
             if (!${{ steps.has-dev.outputs.release-exists }}) {
               versions.push("${{ steps.get-dev.outputs.version }}")
+            }
+            if (!${{ steps.has-longterm.outputs.release-exists }}) {
+              versions.push("${{ steps.get-longterm.outputs.version }}")
             }
             console.log(versions)
             return versions
