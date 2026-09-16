@@ -169,6 +169,10 @@ jobs:
               [ -f "/sys/class/block/$dev/pid" ] || break
               sleep 1
             done
+            if [ -f "/sys/class/block/$dev/pid" ]; then
+              echo "::error::/dev/$dev did not finish tearing down in time"
+              exit 1
+            fi
           done
 
       - name: Remove old
