@@ -117,7 +117,7 @@ jobs:
 
       - name: Download
         run: |
-          curl -skL --retry 3 --connect-timeout 10 --max-time 300 -o chr.img.zip https://download.mikrotik.com/routeros/${{matrix.version}}/chr-${{matrix.version}}.img.zip
+          curl -skL --retry 5 --retry-all-errors --retry-delay 5 --connect-timeout 10 --max-time 300 -o chr.img.zip https://download.mikrotik.com/routeros/${{matrix.version}}/chr-${{matrix.version}}.img.zip
           unzip chr.*.zip
           rm -rf chr.*.zip
 
@@ -164,6 +164,12 @@ jobs:
         run: |
           sudo -E qemu-nbd -d /dev/nbd0
           sudo -E qemu-nbd -d /dev/nbd1
+          for dev in nbd0 nbd1; do
+            for i in $(seq 1 10); do
+              [ -f "/sys/class/block/$dev/pid" ] || break
+              sleep 1
+            done
+          done
 
       - name: Remove old
         run: |
